@@ -10,9 +10,10 @@
     "lint:fix": "next lint --fix",
     "lint:staged": "lint-staged",
     "prettier": "prettier --write .",
-     "prepare": "husky install"
+    "prepare": "husky install"
   },
   "dependencies": {
+    "@vercel/speed-insights": "^1.2.0",
     "next": "15.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
@@ -28,6 +29,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.12",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
