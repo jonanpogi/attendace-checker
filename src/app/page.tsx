@@ -22,8 +22,7 @@ export default function Home() {
         className="mb-4 text-center text-2xl font-bold text-gray-50 sm:text-3xl"
       />
       <BlurText
-        text=" Welcome to the 122nd Attendance Checker. This tool is designed to help
-        you manage and track attendance efficiently."
+        text="This tool helps you generate, scan, and extract attendance — fast and easy. 🚀"
         delay={50}
         animateBy="words"
         direction="top"
