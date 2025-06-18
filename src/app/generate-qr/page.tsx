@@ -1,11 +1,12 @@
 import BackButton from '@/components/BackButton';
 import Container from '@/components/Container';
+import QRGeneratorForm from '@/components/QRGeneratorForm';
 
 const GenerateQR = () => {
   return (
     <Container>
       <BackButton />
-      <h1>Generate QR Code</h1>
+      <QRGeneratorForm />
     </Container>
   );
 };
