@@ -15,13 +15,15 @@ const handler = async (req: NextRequest) => {
     );
   }
 
-  const ciphertext = CryptoJS.AES.encrypt(
-    JSON.stringify(data),
-    SECRET_KEY,
-  ).toString();
+  const { encrypted } = data;
+
+  const bytes = CryptoJS.AES.decrypt(encrypted, SECRET_KEY);
+  const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+
+  // Persist to DB
 
   return NextResponse.json(
-    { encrypted: ciphertext },
+    { decrypted: JSON.parse(decrypted) },
     {
       status: 200,
     },

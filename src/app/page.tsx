@@ -1,3 +1,5 @@
+'use client';
+
 import Container from '@/components/Container';
 import MainSelection from '@/components/MainSelection';
 import AnimatedContent from '@/components/react-bits/AnimatedContent';

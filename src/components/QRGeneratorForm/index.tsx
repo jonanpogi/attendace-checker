@@ -186,10 +186,11 @@ export default function QRGeneratorForm() {
                     size={256}
                     bgColor="#ffffff"
                     fgColor="#000000"
+                    marginSize={2}
                     imageSettings={{
                       src: logoDataUri || '',
-                      height: 48,
-                      width: 48,
+                      height: 32,
+                      width: 32,
                       excavate: true,
                     }}
                   />
