@@ -84,6 +84,7 @@ export default function QRGeneratorForm() {
       },
     );
 
+    setQrValue(null);
     setFormData(initialFormData);
   };
 
@@ -129,7 +130,7 @@ export default function QRGeneratorForm() {
             name={'QrCode'}
             className="h-8 w-8 text-gray-50 sm:h-10 sm:w-10"
           />
-          <h1 className="mb-4 text-2xl font-bold">QR Code Generator</h1>
+          <h1 className="text-2xl font-bold">QR Code Generator</h1>
         </div>
 
         {fields.map((field, index) => (
@@ -146,7 +147,7 @@ export default function QRGeneratorForm() {
           </div>
         ))}
 
-        <div className="mb-18" />
+        <div className="mb-10" />
 
         <button
           disabled={loading || validated}
@@ -162,10 +163,7 @@ export default function QRGeneratorForm() {
       </AnimatedContent>
 
       {qrValue && (
-        <div
-          onClick={() => setQrValue(null)}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm"
-        >
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
           <TiltedCard
             showMobileWarning={false}
             showTooltip={false}
@@ -204,7 +202,7 @@ export default function QRGeneratorForm() {
             className="absolute bottom-10 mt-4 rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
           >
             <Icon name="Download" className="mr-2 inline-block h-5 w-5" />
-            Download PNG
+            Download PNG & Reset
           </button>
         </div>
       )}

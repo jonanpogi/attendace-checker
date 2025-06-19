@@ -15,7 +15,7 @@ const selections = [
     link: '/scann-qr',
   },
   {
-    title: 'View & Extract Events',
+    title: 'View & Extract Event Reports',
     description: 'View and extract attendance events for all personnel.',
     icon: 'File' as IconName,
     link: '/view-events',

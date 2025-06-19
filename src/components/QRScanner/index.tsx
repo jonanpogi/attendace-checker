@@ -1,11 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  IDetectedBarcode,
-  IScannerClassNames,
-  Scanner,
-} from '@yudiel/react-qr-scanner';
+import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
 import Icon from '../Icons';
 import AnimatedContent from '../react-bits/AnimatedContent';
 
@@ -72,15 +68,17 @@ export default function QRScanner() {
             name={'ScanQrCode'}
             className="h-8 w-8 text-gray-50 sm:h-10 sm:w-10"
           />
-          <h1 className="mb-4 text-2xl font-bold">QR Code Generator</h1>
+          <h1 className="text-2xl font-bold">QR Code Scanner</h1>
         </div>
         <Scanner
-          classNames={{ container: 'h-[200px]' } as IScannerClassNames}
           onScan={handleScan}
           onError={handleError}
           allowMultiple
           scanDelay={1000}
         />
+        <p className="mt-4 text-center text-sm text-gray-400">
+          Point your camera at a QR code to scan it.
+        </p>
       </AnimatedContent>
       {scannedText && (
         <div

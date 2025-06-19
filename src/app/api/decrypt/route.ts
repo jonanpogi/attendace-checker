@@ -20,7 +20,7 @@ const handler = async (req: NextRequest) => {
   const bytes = CryptoJS.AES.decrypt(encrypted, SECRET_KEY);
   const decrypted = bytes.toString(CryptoJS.enc.Utf8);
 
-  // Persist to DB
+  // TODO: Persist to DB
 
   return NextResponse.json(
     { decrypted: JSON.parse(decrypted) },

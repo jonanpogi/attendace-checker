@@ -2,12 +2,13 @@
 
 import BackButton from '@/components/BackButton';
 import Container from '@/components/Container';
+import EventList from '@/components/EventList';
 
 const ViewEvents = () => {
   return (
     <Container>
       <BackButton />
-      <h1>View Events</h1>
+      <EventList />
     </Container>
   );
 };
