@@ -1,3 +1,5 @@
+'use client';
+
 type Props = {
   color?: string;
   size?: number;

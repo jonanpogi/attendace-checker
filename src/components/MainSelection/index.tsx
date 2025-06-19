@@ -1,3 +1,5 @@
+'use client';
+
 import { IconName } from '../Icons';
 import SelectionItem from './SelectionItem';
 
@@ -15,7 +17,7 @@ const selections = [
     link: '/scann-qr',
   },
   {
-    title: 'View & Extract Event Reports',
+    title: 'Extract Event Reports',
     description: 'View and extract attendance events for all personnel.',
     icon: 'File' as IconName,
     link: '/view-events',
