@@ -52,6 +52,8 @@ interface AnimatedListProps<T> {
   displayScrollbar?: boolean;
   initialSelectedIndex?: number;
   onScrollEnd?: () => void;
+  leftNode?: ((item: T) => ReactNode) | null;
+  rightNode?: ((item: T) => ReactNode) | null;
 }
 
 const AnimatedList = <T extends { title: string; subTitle: string }>({
@@ -64,6 +66,8 @@ const AnimatedList = <T extends { title: string; subTitle: string }>({
   displayScrollbar = true,
   initialSelectedIndex = -1,
   onScrollEnd = () => {},
+  leftNode = null,
+  rightNode = null,
 }: AnimatedListProps<T>) => {
   const listRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] =
@@ -176,12 +180,18 @@ const AnimatedList = <T extends { title: string; subTitle: string }>({
             <div
               className={`rounded-lg bg-[#111] p-4 shadow-xs shadow-gray-500 ${selectedIndex === index ? 'bg-[#222]' : ''} ${itemClassName}`}
             >
-              <p className="sm:text-md mb-1 text-sm font-semibold text-white">
-                {item?.title || ''}
-              </p>
-              <p className="m-0 text-xs text-gray-400 sm:text-sm">
-                {item?.subTitle || ''}
-              </p>
+              <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
+                {leftNode && leftNode(item)}
+                <div className="mb-2 flex flex-col justify-center gap-1 sm:mb-0">
+                  <p className="sm:text-md text-sm font-semibold text-white">
+                    {item?.title || ''}
+                  </p>
+                  <p className="m-0 text-xs text-gray-400 sm:text-sm">
+                    {item?.subTitle || ''}
+                  </p>
+                </div>
+                {rightNode && rightNode(item)}
+              </div>
             </div>
           </AnimatedItem>
         ))}

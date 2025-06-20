@@ -6,7 +6,7 @@ import Icon from '../Icons';
 import AnimatedContent from '../react-bits/AnimatedContent';
 import LoadingSpinner from '../LoadingSpinner';
 import TiltedCard from '../react-bits/TiltedCard';
-import { saveSvgAsPng } from 'save-svg-as-png';
+// import { saveSvgAsPng } from 'save-svg-as-png';
 
 type FormData = {
   rank: string;
@@ -66,23 +66,23 @@ export default function QRGeneratorForm() {
   };
 
   const handleDownloadQR = () => {
-    const svg = document.querySelector(
-      '#qr-canvas-container svg',
-    ) as SVGElement;
+    // const svg = document.querySelector(
+    //   '#qr-canvas-container svg',
+    // ) as SVGElement;
 
-    if (!svg) {
-      alert('SVG QR not ready');
-      return;
-    }
+    // if (!svg) {
+    //   alert('SVG QR not ready');
+    //   return;
+    // }
 
-    saveSvgAsPng(
-      svg,
-      `${formData.full_name.toUpperCase() || 'UNKNOWN'}_QR.png`,
-      {
-        backgroundColor: '#ffffff',
-        scale: 8,
-      },
-    );
+    // saveSvgAsPng(
+    //   svg,
+    //   `${formData.full_name.toUpperCase() || 'UNKNOWN'}_QR.png`,
+    //   {
+    //     backgroundColor: '#ffffff',
+    //     scale: 8,
+    //   },
+    // );
 
     setQrValue(null);
     setFormData(initialFormData);
@@ -125,13 +125,19 @@ export default function QRGeneratorForm() {
         delay={0.3}
         className="hide-scrollbar mx-auto max-w-xl overflow-y-auto p-6 text-gray-50"
       >
-        <div className="mb-8 flex items-center justify-center gap-2">
+        <div className="mb-4 flex items-center justify-center gap-2">
           <Icon
             name={'QrCode'}
             className="h-8 w-8 text-gray-50 sm:h-10 sm:w-10"
           />
           <h1 className="text-2xl font-bold">QR Code Generator</h1>
         </div>
+
+        <p className="mb-8 text-center text-sm text-gray-400 italic">
+          Complete the form below to generate your QR code.
+          <br />
+          <strong>Note:</strong> All fields must be filled in correctly.
+        </p>
 
         {fields.map((field, index) => (
           <div className="mb-3" key={index}>
@@ -202,8 +208,8 @@ export default function QRGeneratorForm() {
             onClick={handleDownloadQR}
             className="absolute bottom-10 mt-4 rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
           >
-            <Icon name="Download" className="mr-2 inline-block h-5 w-5" />
-            Download PNG & Reset
+            <Icon name="Camera" className="mr-2 inline-block h-5 w-5" />
+            Take a screenshot and you’re good to go!
           </button>
         </div>
       )}
