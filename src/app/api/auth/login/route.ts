@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SignJWT } from 'jose';
 import { COOKIE_TOKEN_NAME } from '@/utils/constants';
-import { LoginSchema } from '@/schemas/auth/loginSchema';
+import { LoginSchema } from '@/schemas/auth/LoginSchema';
 
 const encoder = new TextEncoder();
 
