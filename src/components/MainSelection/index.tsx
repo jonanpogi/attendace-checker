@@ -3,6 +3,10 @@
 import { IconName } from '../Icons';
 import SelectionItem from './SelectionItem';
 
+type Props = {
+  isAuthenticated: boolean;
+};
+
 const selections = [
   {
     title: 'Generate QR Code',
@@ -24,11 +28,15 @@ const selections = [
   },
 ];
 
-const MainSelection = () => {
+const MainSelection = ({ isAuthenticated }: Props) => {
   return (
     <div className="flex h-auto w-full flex-col items-center justify-center gap-5 sm:flex-row">
       {selections.map((selection, index) => (
-        <SelectionItem {...selection} key={index} />
+        <SelectionItem
+          {...selection}
+          isAuthenticated={isAuthenticated!}
+          key={index}
+        />
       ))}
     </div>
   );

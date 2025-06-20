@@ -1,14 +1,19 @@
 'use client';
 
 import Container from '@/components/Container';
+import Greetings from '@/components/Greetings';
 import MainSelection from '@/components/MainSelection';
 import AnimatedContent from '@/components/react-bits/AnimatedContent';
 import BlurText from '@/components/react-bits/BlurText';
+import { useAuth } from '@/hooks/useAuth';
 import Image from 'next/image';
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <Container>
+      <Greetings isAuthenticated={isAuthenticated!} />
       <Image
         src={'122nd_logo.svg'}
         alt="Logo"
@@ -37,13 +42,10 @@ export default function Home() {
         duration={1.2}
         ease="power3.out"
         initialOpacity={0}
-        animateOpacity
         scale={1.1}
-        threshold={0.2}
-        delay={0.3}
-        className="h-auto w-full p-4"
+        className="w-full p-4"
       >
-        <MainSelection />
+        <MainSelection isAuthenticated={isAuthenticated!} />
       </AnimatedContent>
     </Container>
   );

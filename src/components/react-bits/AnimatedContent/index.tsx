@@ -20,6 +20,7 @@ interface AnimatedContentProps {
   delay?: number;
   onComplete?: () => void;
   className?: string;
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 const AnimatedContent: React.FC<AnimatedContentProps> = ({
@@ -36,6 +37,7 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
   delay = 0,
   onComplete,
   className = '',
+  onClick,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -88,7 +90,7 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
   ]);
 
   return (
-    <div ref={ref} className={className}>
+    <div ref={ref} className={className} onClick={onClick}>
       {children}
     </div>
   );

@@ -17,10 +17,10 @@ type FormData = {
 };
 
 const fields = [
-  { name: 'rank', label: 'Rank' },
-  { name: 'full_name', label: 'Full Name' },
-  { name: 'afpsn', label: 'AFPSN' },
-  { name: 'bos', label: 'BOS' },
+  { name: 'rank', label: 'Rank', placeHolder: 'e.g. PO3' },
+  { name: 'full_name', label: 'Full Name', placeHolder: 'e.g. Juan Dela Cruz' },
+  { name: 'afpsn', label: 'AFPSN', placeHolder: 'e.g. BE-***-******' },
+  { name: 'bos', label: 'BOS', placeHolder: 'e.g. PN Res' },
 ];
 
 const initialFormData: FormData = {
@@ -139,6 +139,7 @@ export default function QRGeneratorForm() {
               {field.label}
             </label>
             <input
+              placeholder={field.placeHolder}
               name={field.name}
               value={formData[field.name]}
               onChange={handleChange}

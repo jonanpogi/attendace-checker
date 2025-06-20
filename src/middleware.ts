@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
+import { COOKIE_TOKEN_NAME } from './utils/constants';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const PUBLIC_ROUTES = ['/api/encrypt', '/api/auth/login', '/api/auth/logout'];
@@ -30,7 +31,7 @@ export const middleware = async (req: NextRequest) => {
 
   if (PUBLIC_ROUTES.includes(req.nextUrl.pathname)) return res;
 
-  const token = req.cookies.get('access_token')?.value;
+  const token = req.cookies.get(COOKIE_TOKEN_NAME)?.value;
 
   if (!token) {
     return NextResponse.json({ error: 'Forbidden.' }, { status: 401 });
