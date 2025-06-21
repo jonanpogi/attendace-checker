@@ -6,6 +6,7 @@ import Icon from '../Icons';
 import AnimatedContent from '../react-bits/AnimatedContent';
 
 export default function QRScanner() {
+  const eventId = window.location.pathname.split('/').pop() || '';
   const [errorText, setErrorText] = useState('');
   const [scannedText, setScannedText] = useState('');
 
@@ -30,7 +31,7 @@ export default function QRScanner() {
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-      body: JSON.stringify({ encrypted }),
+      body: JSON.stringify({ encrypted, eventId }),
     });
 
     if (!res.ok) {
