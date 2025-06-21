@@ -26,23 +26,25 @@ const getEvents = async ({
   }
 
   const now = new Date();
-  const todayStart = new Date(now.setHours(0, 0, 0, 0)).toISOString();
-  const todayEnd = new Date(now.setHours(23, 59, 59, 999)).toISOString();
+  const nowISO = now.toISOString();
+  const todayStart = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+  const todayEnd = new Date(new Date().setHours(23, 59, 59, 999)).toISOString();
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
   switch (filter) {
     case 'recent':
-      query = query
-        .lte('end_date', new Date().toISOString())
-        .gte('end_date', weekAgo);
+      query = query.lt('end_date', nowISO).gte('end_date', weekAgo);
       break;
 
     case 'today':
-      query = query.lte('start_date', todayEnd).gte('end_date', todayStart);
+      query = query
+        .gte('start_date', todayStart)
+        .lte('start_date', todayEnd)
+        .gte('end_date', nowISO);
       break;
 
     case 'upcoming':
-      query = query.gt('start_date', new Date().toISOString());
+      query = query.gt('start_date', nowISO);
       break;
 
     case 'all':

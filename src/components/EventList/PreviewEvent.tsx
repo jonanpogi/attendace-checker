@@ -4,6 +4,7 @@ import DrawerFormWrapper from '../DrawerWrapper';
 import Icon from '../Icons';
 import AnimatedContent from '../react-bits/AnimatedContent';
 import { ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   item: Event;
@@ -12,10 +13,12 @@ type Props = {
 };
 
 const PreviewEvent = ({ item, onDrawerClose, status }: Props) => {
+  const router = useRouter();
+
   return (
     <DrawerFormWrapper>
       <CloseButton onClose={onDrawerClose} />
-      <div className="flex flex-col gap-4">
+      <div className="flex h-full flex-col gap-4">
         <AnimatedContent
           distance={150}
           direction="vertical"
@@ -27,7 +30,7 @@ const PreviewEvent = ({ item, onDrawerClose, status }: Props) => {
           scale={1.1}
           threshold={0.2}
           delay={0.3}
-          className="text-gray-50"
+          className="h-full text-gray-50"
         >
           <div className="space-y-3 text-sm text-gray-300">
             <div className="my-8 flex items-center justify-between text-3xl font-bold sm:text-4xl">
@@ -64,6 +67,23 @@ const PreviewEvent = ({ item, onDrawerClose, status }: Props) => {
         </AnimatedContent>
 
         <div className="grow" />
+
+        <div className="flex w-full flex-col gap-2 sm:flex-row">
+          <button
+            className="flex w-full items-center justify-center rounded-full bg-slate-900 px-2 py-1 text-gray-50"
+            onClick={() => alert('Feature coming soon!')}
+          >
+            <Icon name="FileSpreadsheet" className="h-3 w-3 sm:h-5 sm:w-5" />
+            <span className="ml-2 font-semibold">Generate XLSX</span>
+          </button>
+          <button
+            className="bg-primary flex w-full items-center justify-center rounded-full px-2 py-1 text-gray-900"
+            onClick={() => router.push(`/scann-qr/${item.id}`)}
+          >
+            <Icon name="ScanQrCode" className="h-3 w-3 sm:h-5 sm:w-5" />
+            <span className="ml-2 font-semibold">Scan QR Now?</span>
+          </button>
+        </div>
       </div>
     </DrawerFormWrapper>
   );

@@ -191,6 +191,8 @@ const EventList = () => {
                     : 'border bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400'
                 }`}
                 onClick={() => {
+                  if (query.filter === filter.name) return;
+
                   setQuery((prevQuery) => ({
                     ...prevQuery,
                     filter: filter.name,

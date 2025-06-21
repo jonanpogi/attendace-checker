@@ -6,9 +6,11 @@ import MainSelection from '@/components/MainSelection';
 import AnimatedContent from '@/components/react-bits/AnimatedContent';
 import BlurText from '@/components/react-bits/BlurText';
 import { useAuth } from '@/hooks/useAuth';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import Image from 'next/image';
 
 export default function Home() {
+  const isMobile = useMediaQuery('(max-width: 640px)');
   const { isAuthenticated } = useAuth();
 
   return (
@@ -17,8 +19,8 @@ export default function Home() {
       <Image
         src={'122nd_logo.svg'}
         alt="Logo"
-        width={50}
-        height={50}
+        width={isMobile ? 50 : 80}
+        height={isMobile ? 50 : 80}
         className="mb-2 inline-block"
       />
       <BlurText
