@@ -7,6 +7,7 @@ import DrawerFormWrapper from '../DrawerWrapper';
 import CloseButton from '../CloseButton';
 import LoadingSpinner from '../LoadingSpinner';
 import { triggerToast } from '../ToastContainer';
+import { getLocalDatetimeMin } from '@/utils/getLocalDatetimeMin';
 
 type FormData = {
   name: string;
@@ -113,6 +114,7 @@ const AddEvent = ({ onDrawerClose, refetchEvents }: Props) => {
                 register('start_date').onChange(e);
               }}
               className="w-full rounded-md border border-gray-700 bg-gray-800 p-2"
+              min={new Date().toISOString().slice(0, 16)}
             />
             {errors.start_date && (
               <p className="mt-1 text-sm text-red-500">
@@ -132,6 +134,7 @@ const AddEvent = ({ onDrawerClose, refetchEvents }: Props) => {
                 register('end_date').onChange(e);
               }}
               className="w-full rounded-md border border-gray-700 bg-gray-800 p-2"
+              min={getLocalDatetimeMin()}
             />
             {errors.end_date && (
               <p className="mt-1 text-sm text-red-500">

@@ -26,8 +26,8 @@ const filters = [
 ];
 
 const sortOptions = [
-  { name: 'newest', label: 'Newest', key: 'created_at', ascending: false },
-  { name: 'oldest', label: 'Oldest', key: 'created_at', ascending: true },
+  { name: 'newest', label: 'Newest', key: 'start_date', ascending: false },
+  { name: 'oldest', label: 'Oldest', key: 'start_date', ascending: true },
   { name: 'az', label: 'A-Z', key: 'name', ascending: true },
   { name: 'za', label: 'Z-A', key: 'name', ascending: false },
 ];
@@ -38,7 +38,7 @@ const EventList = () => {
     perPage: DEFAULT_PER_PAGE,
     filter: 'today',
     searchTerm: '',
-    sortBy: 'created_at',
+    sortBy: 'start_date',
     ascending: false,
   });
   const [selectedSort, setSelectedSort] = useState(sortOptions[0].name);
@@ -102,9 +102,9 @@ const EventList = () => {
   };
 
   const renderTodayStatus = (item: Event) => {
-    const now = new Date();
-    const start = new Date(item.start_date);
-    const end = new Date(item.end_date);
+    const now = Date.now();
+    const start = new Date(item.start_date).getTime();
+    const end = new Date(item.end_date).getTime();
     const aboutToStartThreshold = 15 * 60 * 1000;
 
     let status = '';
@@ -116,7 +116,7 @@ const EventList = () => {
     } else if (now >= start && now <= end) {
       status = 'Happening Now';
       className = 'bg-green-700 text-white';
-    } else if (start.getTime() - now.getTime() <= aboutToStartThreshold) {
+    } else if (start - now <= aboutToStartThreshold) {
       status = 'About to Start';
       className = 'bg-yellow-500 text-white';
     } else {
