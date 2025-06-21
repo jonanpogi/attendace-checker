@@ -15,6 +15,10 @@ type Props = {
 const PreviewEvent = ({ item, onDrawerClose, status }: Props) => {
   const router = useRouter();
 
+  const handleGenerateSpreadsheet = () => {
+    window.open(`/api/attendance/export?event_id=${item.id}`, '_blank');
+  };
+
   return (
     <DrawerFormWrapper>
       <CloseButton onClose={onDrawerClose} />
@@ -71,10 +75,10 @@ const PreviewEvent = ({ item, onDrawerClose, status }: Props) => {
         <div className="flex w-full flex-col gap-2 sm:flex-row">
           <button
             className="flex w-full items-center justify-center rounded-full bg-slate-900 px-2 py-1 text-gray-50"
-            onClick={() => alert('Feature coming soon!')}
+            onClick={handleGenerateSpreadsheet}
           >
             <Icon name="FileSpreadsheet" className="h-3 w-3 sm:h-5 sm:w-5" />
-            <span className="ml-2 font-semibold">Generate XLSX</span>
+            <span className="ml-2 font-semibold">Generate Spreadsheet</span>
           </button>
           <button
             className="bg-primary flex w-full items-center justify-center rounded-full px-2 py-1 text-gray-900"
