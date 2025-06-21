@@ -30,7 +30,7 @@ const handler = async (req: NextRequest) => {
   });
 
   return NextResponse.json(
-    { data: result },
+    { data: result.id },
     {
       status: 201,
     },
