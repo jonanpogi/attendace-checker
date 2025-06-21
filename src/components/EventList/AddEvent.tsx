@@ -8,6 +8,7 @@ import CloseButton from '../CloseButton';
 import LoadingSpinner from '../LoadingSpinner';
 import { triggerToast } from '../ToastContainer';
 import { getLocalDatetimeMin } from '@/utils/getLocalDatetimeMin';
+import { toUTCISOString } from '@/utils/toUTCISOString';
 
 type FormData = {
   name: string;
@@ -33,13 +34,19 @@ const AddEvent = ({ onDrawerClose, refetchEvents }: Props) => {
   });
 
   const onSubmit = async (data: FormData) => {
+    const payload = {
+      ...data,
+      start_date: toUTCISOString(data.start_date),
+      end_date: toUTCISOString(data.end_date),
+    };
+
     try {
       const response = await fetch('/api/events', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
