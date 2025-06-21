@@ -22,7 +22,7 @@ const ScannQr = () => {
   });
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchEventsToday = async (page: number, perPage: number) => {
     try {
