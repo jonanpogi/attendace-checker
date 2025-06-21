@@ -1,0 +1,163 @@
+'use client';
+
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { PostEventSchema } from '@/schemas/events/PostEventSchema';
+import DrawerFormWrapper from '../DrawerWrapper';
+import CloseButton from '../CloseButton';
+import LoadingSpinner from '../LoadingSpinner';
+import { triggerToast } from '../ToastContainer';
+
+type FormData = {
+  name: string;
+  start_date: string;
+  end_date: string;
+  description?: string;
+};
+
+type Props = {
+  onDrawerClose: () => void;
+  refetchEvents: () => void;
+};
+
+const AddEvent = ({ onDrawerClose, refetchEvents }: Props) => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    clearErrors,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
+    resolver: zodResolver(PostEventSchema),
+  });
+
+  const onSubmit = async (data: FormData) => {
+    try {
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        console.log('Failed to add event:', response.statusText);
+        triggerToast('error', 'Failed to add event. Please try again.');
+        return;
+      }
+
+      reset();
+      refetchEvents();
+      onDrawerClose();
+      triggerToast('success', 'Event added successfully!');
+    } catch (error) {
+      console.error(error);
+      triggerToast('error', 'Failed to add event. Please try again.');
+    }
+  };
+
+  return (
+    <DrawerFormWrapper>
+      <CloseButton onClose={onDrawerClose} />
+      <div className="flex h-full flex-col gap-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="mx-auto flex h-full max-w-md flex-col space-y-4"
+        >
+          <h2 className="mb-4 text-xl font-bold">Add New Event</h2>
+
+          {/* Name */}
+          <div className="mb-3">
+            <label className="mb-1 block text-sm capitalize">Name</label>
+            <input
+              type="text"
+              {...register('name')}
+              onChange={(e) => {
+                clearErrors('name');
+                register('name').onChange(e);
+              }}
+              className="w-full rounded-md border border-gray-700 bg-gray-800 p-2"
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+            )}
+          </div>
+
+          {/* Description */}
+          <div className="mb-3">
+            <label className="mb-1 block text-sm capitalize">Description</label>
+            <textarea
+              {...register('description')}
+              onChange={(e) => {
+                clearErrors('description');
+                register('description').onChange(e);
+              }}
+              className="w-full rounded-md border border-gray-700 bg-gray-800 p-2"
+            />
+            {errors.description && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.description.message}
+              </p>
+            )}
+          </div>
+
+          {/* Start Date */}
+          <div>
+            <label className="mb-1 block text-sm capitalize">Start Date</label>
+            <input
+              type="datetime-local"
+              {...register('start_date')}
+              onChange={(e) => {
+                clearErrors('start_date');
+                register('start_date').onChange(e);
+              }}
+              className="w-full rounded-md border border-gray-700 bg-gray-800 p-2"
+            />
+            {errors.start_date && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.start_date.message}
+              </p>
+            )}
+          </div>
+
+          {/* End Date */}
+          <div>
+            <label className="mb-1 block text-sm capitalize">End Date</label>
+            <input
+              type="datetime-local"
+              {...register('end_date')}
+              onChange={(e) => {
+                clearErrors('end_date');
+                register('end_date').onChange(e);
+              }}
+              className="w-full rounded-md border border-gray-700 bg-gray-800 p-2"
+            />
+            {errors.end_date && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.end_date.message}
+              </p>
+            )}
+          </div>
+
+          <div className="grow" />
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="mb-4 flex w-full items-center justify-center rounded bg-slate-800 px-4 py-2 font-bold text-gray-50 hover:bg-slate-700 active:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isSubmitting ? (
+              <LoadingSpinner color="text-gray-50" />
+            ) : (
+              'Save Form'
+            )}
+          </button>
+        </form>
+      </div>
+    </DrawerFormWrapper>
+  );
+};
+
+export default AddEvent;

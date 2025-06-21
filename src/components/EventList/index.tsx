@@ -14,19 +14,20 @@ import Drawer from 'react-modern-drawer';
 import 'react-modern-drawer/dist/index.css';
 import PreviewEvent from './PreviewEvent';
 import useMediaQuery from '@/hooks/useMediaQuery';
+import AddEvent from './AddEvent';
 
-const Preview = Drawer;
+const PreviewDrawer = Drawer;
+const AddDrawer = Drawer;
 
 const filters = [
   { name: 'today', label: 'Today' },
-  { name: 'upcoming', label: 'Upcoming' },
   { name: 'recent', label: 'Recent' },
   { name: 'all', label: 'All' },
 ];
 
 const sortOptions = [
-  { name: 'newest', label: 'Newest', key: 'created_at', ascending: true },
-  { name: 'oldest', label: 'Oldest', key: 'created_at', ascending: false },
+  { name: 'newest', label: 'Newest', key: 'created_at', ascending: false },
+  { name: 'oldest', label: 'Oldest', key: 'created_at', ascending: true },
   { name: 'az', label: 'A-Z', key: 'name', ascending: true },
   { name: 'za', label: 'Z-A', key: 'name', ascending: false },
 ];
@@ -38,14 +39,15 @@ const EventList = () => {
     filter: 'today',
     searchTerm: '',
     sortBy: 'created_at',
-    ascending: true,
+    ascending: false,
   });
   const [selectedSort, setSelectedSort] = useState(sortOptions[0].name);
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [items, setItems] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
+  const [isAddOpen, setIsAddOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Event | null>(null);
   const isMobile = useMediaQuery('(max-width: 640px)');
 
@@ -86,6 +88,17 @@ const EventList = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const refetchEvents = () => {
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      page: DEFAULT_PAGE,
+    }));
+    setItems([]);
+    setLoading(true);
+    setTotalPages(0);
+    setTotalItems(0);
   };
 
   const renderTodayStatus = (item: Event) => {
@@ -243,7 +256,7 @@ const EventList = () => {
             }))}
             onItemSelect={(item) => [
               setSelectedItem(item),
-              setIsDrawerOpen(true),
+              setIsPreviewOpen(true),
             ]}
             showGradients={true}
             enableArrowNavigation={true}
@@ -260,17 +273,20 @@ const EventList = () => {
         )}
 
         {/* Add Event */}
-        <button className="absolute bottom-0 flex w-full items-center justify-center rounded bg-slate-900 px-4 py-2 font-bold text-gray-50 hover:bg-slate-800 active:bg-slate-700 sm:w-[500px]">
+        <button
+          onClick={() => setIsAddOpen(true)}
+          className="absolute bottom-0 flex w-full items-center justify-center rounded bg-slate-900 px-4 py-2 font-bold text-gray-50 hover:bg-slate-800 active:bg-slate-700 sm:w-[500px]"
+        >
           Add New Event
         </button>
       </AnimatedContent>
 
       {/* Preview Drawer */}
-      <Preview
-        customIdSuffix="drawer-categories"
-        open={isDrawerOpen}
+      <PreviewDrawer
+        customIdSuffix="preview-event"
+        open={isPreviewOpen}
         direction={'right'}
-        onClose={() => setIsDrawerOpen(false)}
+        onClose={() => setIsPreviewOpen(false)}
         size={isMobile ? 320 : 400}
         style={{
           backgroundColor: '#0f172b',
@@ -282,10 +298,28 @@ const EventList = () => {
             key={selectedItem.id}
             item={selectedItem}
             status={(item) => renderTodayStatus(item)}
-            onDrawerClose={() => setIsDrawerOpen(false)}
+            onDrawerClose={() => setIsPreviewOpen(false)}
           />
         )}
-      </Preview>
+      </PreviewDrawer>
+
+      {/* Add Drawer */}
+      <AddDrawer
+        customIdSuffix="add-event"
+        open={isAddOpen}
+        direction={'right'}
+        onClose={() => setIsAddOpen(false)}
+        size={isMobile ? 320 : 400}
+        style={{
+          backgroundColor: '#0f172b',
+          backdropFilter: 'blur(10px)',
+        }}
+      >
+        <AddEvent
+          refetchEvents={refetchEvents}
+          onDrawerClose={() => setIsAddOpen(false)}
+        />
+      </AddDrawer>
     </>
   );
 };
