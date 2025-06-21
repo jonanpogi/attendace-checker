@@ -1,6 +1,7 @@
 'use client';
 
 import Container from '@/components/Container';
+import FloatingBadge from '@/components/FloatingBadge';
 import Greetings from '@/components/Greetings';
 import MainSelection from '@/components/MainSelection';
 import AnimatedContent from '@/components/react-bits/AnimatedContent';
@@ -49,6 +50,7 @@ export default function Home() {
       >
         <MainSelection isAuthenticated={isAuthenticated!} />
       </AnimatedContent>
+      <FloatingBadge />
     </Container>
   );
 }
