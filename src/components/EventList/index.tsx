@@ -289,7 +289,7 @@ const EventList = () => {
         open={isPreviewOpen}
         direction={'right'}
         onClose={() => setIsPreviewOpen(false)}
-        size={isMobile ? 320 : 400}
+        size={isMobile ? 320 : 550}
         style={{
           backgroundColor: '#0f172b',
           backdropFilter: 'blur(10px)',
@@ -311,7 +311,7 @@ const EventList = () => {
         open={isAddOpen}
         direction={'right'}
         onClose={() => setIsAddOpen(false)}
-        size={isMobile ? 320 : 400}
+        size={isMobile ? 320 : 550}
         style={{
           backgroundColor: '#0f172b',
           backdropFilter: 'blur(10px)',

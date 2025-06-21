@@ -22,7 +22,7 @@ const PreviewEvent = ({ item, onDrawerClose, status }: Props) => {
   return (
     <DrawerFormWrapper>
       <CloseButton onClose={onDrawerClose} />
-      <div className="flex h-full flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <AnimatedContent
           distance={150}
           direction="vertical"
