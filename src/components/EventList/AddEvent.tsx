@@ -12,6 +12,7 @@ import { toUTCISOString } from '@/utils/toUTCISOString';
 
 type FormData = {
   name: string;
+  activity: string;
   start_date: string;
   end_date: string;
   description?: string;
@@ -89,6 +90,25 @@ const AddEvent = ({ onDrawerClose, refetchEvents }: Props) => {
             />
             {errors.name && (
               <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+            )}
+          </div>
+
+          {/* Activity */}
+          <div className="mb-3">
+            <label className="mb-1 block text-sm capitalize">Activity</label>
+            <input
+              type="text"
+              {...register('activity')}
+              onChange={(e) => {
+                clearErrors('activity');
+                register('activity').onChange(e);
+              }}
+              className="w-full rounded-md border border-gray-700 bg-gray-800 p-2"
+            />
+            {errors.activity && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.activity.message}
+              </p>
             )}
           </div>
 

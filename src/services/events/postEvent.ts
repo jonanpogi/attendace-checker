@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 
 const postEvents = async ({
   name,
+  activity,
   description,
   start_date,
   end_date,
@@ -12,6 +13,7 @@ const postEvents = async ({
     .insert([
       {
         name,
+        activity,
         description,
         start_date,
         end_date,
@@ -24,7 +26,7 @@ const postEvents = async ({
     console.error({
       fn_name: 'putEvents',
       error: error.message,
-      params: { name, description, start_date, end_date },
+      params: { name, activity, description, start_date, end_date },
       timestamp: new Date().toISOString(),
     });
 

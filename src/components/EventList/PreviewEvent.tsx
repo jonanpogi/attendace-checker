@@ -44,6 +44,13 @@ const PreviewEvent = ({ item, onDrawerClose, status }: Props) => {
 
             <div className="flex flex-col items-start gap-2 text-gray-400">
               <div className="flex flex-row items-center gap-2">
+                <Icon name="Activity" className="h-4 w-4 text-blue-400" />
+                <span>
+                  <strong>Activity:</strong> {item.activity || '—'}
+                </span>
+              </div>
+
+              <div className="flex flex-row items-center gap-2">
                 <Icon name="CalendarDays" className="h-4 w-4 text-green-400" />
                 <span>
                   <strong>Start:</strong>{' '}
