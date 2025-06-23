@@ -16,12 +16,14 @@ import PreviewEvent from './PreviewEvent';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import AddEvent from './AddEvent';
 import { triggerToast } from '../ToastContainer';
+import useScreenWidth from '@/hooks/useScreenWidth';
 
 const PreviewDrawer = Drawer;
 const AddDrawer = Drawer;
 
 const filters = [
   { name: 'today', label: 'Today' },
+  { name: 'upcoming', label: 'Upcoming' },
   { name: 'recent', label: 'Recent' },
   { name: 'all', label: 'All' },
 ];
@@ -35,7 +37,6 @@ const sortOptions = [
 
 const EventList = () => {
   const abortRef = useRef<AbortController | null>(null);
-  const requestIdRef = useRef(0);
   const [query, setQuery] = useState({
     page: DEFAULT_PAGE,
     perPage: DEFAULT_PER_PAGE,
@@ -53,6 +54,7 @@ const EventList = () => {
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Event | null>(null);
   const isMobile = useMediaQuery('(max-width: 640px)');
+  const screenWidth = useScreenWidth();
 
   const fetchEvents = async (
     page: number,
@@ -68,7 +70,6 @@ const EventList = () => {
 
     const controller = new AbortController();
     abortRef.current = controller;
-    const currentRequestId = ++requestIdRef.current;
 
     try {
       let url = `/api/events?page=${page}&perPage=${perPage}&filter=${filter}&sortBy=${sortBy}&ascending=${ascending}`;
@@ -90,7 +91,6 @@ const EventList = () => {
       }
 
       const data = await response.json();
-      if (currentRequestId !== requestIdRef.current) return; // stale
 
       const items = data?.data?.docs || [];
       const totalP = data?.data?.totalPages || 1;
@@ -312,7 +312,7 @@ const EventList = () => {
         open={isPreviewOpen}
         direction={'right'}
         onClose={() => setIsPreviewOpen(false)}
-        size={isMobile ? 320 : 550}
+        size={isMobile ? screenWidth || 320 : 550}
         style={{
           backgroundColor: '#0f172b',
           backdropFilter: 'blur(10px)',
@@ -335,7 +335,7 @@ const EventList = () => {
         open={isAddOpen}
         direction={'right'}
         onClose={() => setIsAddOpen(false)}
-        size={isMobile ? 320 : 550}
+        size={isMobile ? screenWidth || 320 : 550}
         style={{
           backgroundColor: '#0f172b',
           backdropFilter: 'blur(10px)',

@@ -22,7 +22,7 @@ const addAttendance = async ({
     console.error({
       fn_name: 'addAttendance',
       stage: 'check_existing',
-      error: checkError.message,
+      error: checkError,
       params: { event_id, user_afpsn },
       timestamp: new Date().toISOString(),
     });

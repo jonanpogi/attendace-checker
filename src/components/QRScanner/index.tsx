@@ -9,6 +9,10 @@ export default function QRScanner() {
   const eventId = window.location.pathname.split('/').pop() || '';
   const [errorText, setErrorText] = useState('');
   const [scannedText, setScannedText] = useState('');
+  const [paused, setPaused] = useState(false);
+  const [scannedResult, setScannedResult] = useState<{
+    [key: string]: string;
+  }>();
 
   const handleScan = async (result: IDetectedBarcode[]) => {
     if (result.length === 0) {
@@ -35,14 +39,17 @@ export default function QRScanner() {
     });
 
     if (!res.ok) {
-      const errorData = await res.json();
-      setErrorText(`Error: ${errorData.message || 'Failed to scan QR code.'}`);
+      const errorData = await res.text();
+      setErrorText(`Error: ${errorData || 'Failed to scan QR code.'}`);
       setScannedText('');
       return;
     }
 
+    const data = await res.json();
+    setScannedResult(data.data.context);
     setScannedText('Scanned Successfully!');
     setErrorText('');
+    setPaused(true);
   };
 
   const handleError = () => {
@@ -76,11 +83,35 @@ export default function QRScanner() {
           onScan={handleScan}
           onError={handleError}
           allowMultiple
-          scanDelay={1000}
+          paused={paused}
         />
-        <p className="mt-4 text-center text-sm text-gray-400">
-          Point your camera at a QR code to scan it.
-        </p>
+        {!scannedResult ? (
+          <p className="mt-4 text-center text-sm text-gray-400">
+            Point your camera at a QR code to scan it.
+          </p>
+        ) : (
+          <div className="mt-6 flex w-full max-w-md flex-col items-center justify-center rounded-lg bg-green-800 bg-gradient-to-br from-green-900 via-green-700 to-green-800 p-6 text-green-100 shadow-lg">
+            <p className="mb-3 text-2xl font-semibold tracking-wide drop-shadow-sm">
+              ✅ Scanned Result:
+            </p>
+            <span className="mb-1 text-xl font-bold text-white drop-shadow-md">
+              {scannedResult?.full_name}
+            </span>
+            <span className="mb-4 text-sm font-medium tracking-wide text-green-200">
+              {scannedResult?.afpsn}
+            </span>
+            <button
+              onClick={() => {
+                setScannedResult(undefined);
+                setPaused(false);
+                setScannedText('');
+              }}
+              className="w-full rounded-md bg-green-600 py-3 text-center text-sm font-semibold text-white shadow-md transition-colors duration-300 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
+            >
+              ↺ Continue Scanning?
+            </button>
+          </div>
+        )}
       </AnimatedContent>
       {scannedText && (
         <div
