@@ -132,8 +132,36 @@ const ScannQr = () => {
               <LoadingSpinner color="text-gray-50" size={2} />
             </div>
           ) : totalItems === 0 ? (
-            <div className="flex min-h-[440px] w-full grow items-center justify-center">
-              <p className="text-gray-50 italic">Nothing to show. 📂</p>
+            <div className="flex min-h-[440px] w-full grow flex-col items-center justify-center px-4 text-center">
+              <div className="max-w-md">
+                <h2 className="mb-3 text-2xl font-bold text-gray-100">
+                  No Events Found 📭
+                </h2>
+                <p className="text-gray-400">
+                  Create your first event and get things rolling.
+                </p>
+
+                <button
+                  onClick={() => router.push('/view-events')}
+                  className="mt-6 inline-flex animate-bounce items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-blue-700 active:scale-100 active:bg-blue-800"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  Create Event
+                </button>
+              </div>
             </div>
           ) : (
             <AnimatedList

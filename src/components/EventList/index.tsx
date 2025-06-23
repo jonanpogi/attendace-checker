@@ -4,7 +4,7 @@ import { Event } from '@/types/events';
 import Icon from '../Icons';
 import AnimatedContent from '../react-bits/AnimatedContent';
 import AnimatedList from '../react-bits/AnimatedList';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DEFAULT_PAGE, DEFAULT_PER_PAGE } from '@/utils/constants';
 import LoadingSpinner from '../LoadingSpinner';
 import { formatISODate } from '@/utils/formatIsoDate';
@@ -15,6 +15,7 @@ import 'react-modern-drawer/dist/index.css';
 import PreviewEvent from './PreviewEvent';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import AddEvent from './AddEvent';
+import { triggerToast } from '../ToastContainer';
 
 const PreviewDrawer = Drawer;
 const AddDrawer = Drawer;
@@ -33,6 +34,8 @@ const sortOptions = [
 ];
 
 const EventList = () => {
+  const abortRef = useRef<AbortController | null>(null);
+  const requestIdRef = useRef(0);
   const [query, setQuery] = useState({
     page: DEFAULT_PAGE,
     perPage: DEFAULT_PER_PAGE,
@@ -59,32 +62,51 @@ const EventList = () => {
     sortBy: string,
     ascending: boolean,
   ) => {
+    if (abortRef.current) {
+      abortRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const currentRequestId = ++requestIdRef.current;
+
     try {
       let url = `/api/events?page=${page}&perPage=${perPage}&filter=${filter}&sortBy=${sortBy}&ascending=${ascending}`;
-
       if (searchTerm) {
         url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
       }
 
       const response = await fetch(url, {
+        signal: controller.signal,
         credentials: 'include',
       });
 
       if (!response.ok) {
         console.error('Error fetching events:', await response.text());
+        triggerToast(
+          'error',
+          'Failed to fetch events. Please try again later.',
+        );
       }
 
       const data = await response.json();
+      if (currentRequestId !== requestIdRef.current) return; // stale
+
       const items = data?.data?.docs || [];
       const totalP = data?.data?.totalPages || 1;
       const totalDocs = data?.data?.total || 0;
 
-      if (totalP !== totalPages) setTotalPages(totalP);
-      if (totalDocs !== totalItems) setTotalItems(totalDocs || 0);
-
-      setItems((prevItems) => [...prevItems, ...items]);
-    } catch (error) {
-      console.error('Error fetching events:', error);
+      setTotalPages(totalP);
+      setTotalItems(totalDocs);
+      setItems((prevItems) => (page === 1 ? items : [...prevItems, ...items]));
+    } catch (err) {
+      if (err instanceof Error && err.name !== 'AbortError') {
+        console.error('Error fetching events:', err);
+        triggerToast(
+          'error',
+          'Failed to fetch events. Please try again later.',
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -277,8 +299,9 @@ const EventList = () => {
         {/* Add Event */}
         <button
           onClick={() => setIsAddOpen(true)}
-          className="absolute bottom-0 flex w-full items-center justify-center rounded bg-slate-900 px-4 py-2 font-bold text-gray-50 hover:bg-slate-800 active:bg-slate-700 sm:w-[500px]"
+          className="absolute bottom-0 flex w-full items-center justify-center gap-2 rounded bg-slate-900 px-4 py-2 font-bold text-gray-50 hover:bg-slate-800 active:bg-slate-700 sm:w-[500px]"
         >
+          <Icon name="Plus" className="h-4 w-4 sm:h-5 sm:w-5" />
           Add New Event
         </button>
       </AnimatedContent>
@@ -301,6 +324,7 @@ const EventList = () => {
             item={selectedItem}
             status={(item) => renderTodayStatus(item)}
             onDrawerClose={() => setIsPreviewOpen(false)}
+            refetchEvents={refetchEvents}
           />
         )}
       </PreviewDrawer>

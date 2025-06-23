@@ -9,6 +9,7 @@ interface IconProps {
   className?: string;
   size?: number;
   color?: string;
+  onClick?: () => void;
 }
 
 const Icon = ({
@@ -16,6 +17,7 @@ const Icon = ({
   className = '',
   size = 24,
   color = 'currentColor',
+  onClick = () => {},
 }: IconProps) => {
   const LucideIcon = LucideIcons[name] as
     | React.ComponentType<{
@@ -30,7 +32,14 @@ const Icon = ({
     return null;
   }
 
-  return <LucideIcon className={className} size={size} color={color} />;
+  return (
+    <div
+      onClick={onClick}
+      className="cursor-pointer transition-transform duration-200 hover:scale-105"
+    >
+      <LucideIcon className={className} size={size} color={color} />
+    </div>
+  );
 };
 
 export default Icon;

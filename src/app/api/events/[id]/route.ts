@@ -1,4 +1,5 @@
 import getEvent from '@/services/events/geEvent';
+import patchEvent from '@/services/events/patchEvent';
 import { NextRequest, NextResponse } from 'next/server';
 
 const getByIdHandler = async (req: NextRequest) => {
@@ -35,4 +36,39 @@ const getByIdHandler = async (req: NextRequest) => {
   }
 };
 
-export { getByIdHandler as GET };
+const patchByIdHandler = async (req: NextRequest) => {
+  const pathParams = req.nextUrl.pathname.split('/');
+  const eventId = pathParams[pathParams.length - 1];
+  const eventData = await req.json();
+
+  try {
+    const { id } = await patchEvent(eventId, eventData);
+
+    return NextResponse.json(
+      {
+        data: id,
+      },
+      {
+        status: 200,
+      },
+    );
+  } catch (error) {
+    console.error({
+      route: `/api/events/${eventId}`,
+      method: 'PATCH',
+      error: (error as Error).message,
+      timestamp: new Date().toISOString(),
+    });
+
+    return NextResponse.json(
+      {
+        error: (error as Error).message,
+      },
+      {
+        status: 500,
+      },
+    );
+  }
+};
+
+export { getByIdHandler as GET, patchByIdHandler as PATCH };

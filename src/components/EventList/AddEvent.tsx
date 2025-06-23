@@ -9,6 +9,7 @@ import LoadingSpinner from '../LoadingSpinner';
 import { triggerToast } from '../ToastContainer';
 import { getLocalDatetimeMin } from '@/utils/getLocalDatetimeMin';
 import { toUTCISOString } from '@/utils/toUTCISOString';
+import Icon from '../Icons';
 
 type FormData = {
   name: string;
@@ -74,7 +75,10 @@ const AddEvent = ({ onDrawerClose, refetchEvents }: Props) => {
           onSubmit={handleSubmit(onSubmit)}
           className="mx-auto flex h-full max-w-md flex-col space-y-4"
         >
-          <h2 className="mb-4 text-xl font-bold">Add New Event</h2>
+          <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
+            <Icon name="Plus" className="h-5 w-5" />
+            Add New Event
+          </h2>
 
           {/* Name */}
           <div className="mb-3">

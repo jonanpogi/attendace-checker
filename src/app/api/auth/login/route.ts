@@ -46,7 +46,7 @@ const handler = async (req: NextRequest) => {
     secure: process.env.NODE_ENV === 'production',
     path: '/',
     sameSite: 'lax',
-    maxAge: 60 * 60 * 24, // 1 day
+    maxAge: 60 * 60 * 24 * 90, // 90 days
   });
 
   return res;
