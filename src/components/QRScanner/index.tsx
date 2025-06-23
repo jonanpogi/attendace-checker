@@ -82,7 +82,7 @@ export default function QRScanner() {
         <Scanner
           onScan={handleScan}
           onError={handleError}
-          allowMultiple
+          allowMultiple={false}
           paused={paused}
         />
         {!scannedResult ? (
