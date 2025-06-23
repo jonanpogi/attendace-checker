@@ -39,8 +39,29 @@ const PreviewEvent = ({
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  const handleGenerateSpreadsheet = () => {
-    window.open(`/api/attendance/export?event_id=${item.id}`, '_blank');
+  const handleGenerateSpreadsheet = async () => {
+    try {
+      const response = await fetch(
+        `/api/attendance/export?event_id=${item.id}`,
+        {
+          credentials: 'include',
+        },
+      );
+      if (!response.ok) throw new Error('Failed to generate spreadsheet');
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'attendance.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to generate spreadsheet');
+    }
   };
 
   const handleUpdate = async () => {
