@@ -116,15 +116,17 @@ const ScannQr = () => {
           delay={0.3}
           className="p-6 text-gray-50"
         >
-          <div className="mb-8 flex items-center justify-center gap-2">
-            <Icon
-              name={'BoxSelect'}
-              className="h-8 w-8 text-gray-50 sm:h-10 sm:w-10"
-            />
-            <h1 className="text-2xl font-bold">
-              {'Select an Event to Proceed >>'}
-            </h1>
-          </div>
+          {items.length !== 0 && (
+            <div className="mb-8 flex items-center justify-center gap-2">
+              <Icon
+                name={'BoxSelect'}
+                className="h-8 w-8 text-gray-50 sm:h-10 sm:w-10"
+              />
+              <h1 className="text-2xl font-bold">
+                {'Select an Event to Proceed >>'}
+              </h1>
+            </div>
+          )}
 
           {/* List & Loading */}
           {loading ? (
@@ -145,20 +147,7 @@ const ScannQr = () => {
                   onClick={() => router.push('/view-events')}
                   className="mt-6 inline-flex animate-bounce items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-blue-700 active:scale-100 active:bg-blue-800"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v16m8-8H4"
-                    />
-                  </svg>
+                  <Icon name="Plus" className="h-5 w-5" />
                   Create Event
                 </button>
               </div>

@@ -46,7 +46,10 @@ const SortButton = ({ options, selected, onChange }: Props) => {
         className="sm:text-md flex w-full items-center gap-2 rounded-full text-sm font-semibold text-gray-50"
       >
         <Icon name="Filter" className="h-2 w-2 sm:h-3 sm:w-3" />
-        <span>Sort by {selectedOption?.label ?? 'Select'}</span>
+        <span>Sort by </span>
+        <span className="flex h-[30px] items-center rounded-full bg-gray-200 px-3 py-0 text-gray-800">
+          {selectedOption?.label ?? 'Select'}
+        </span>
       </div>
 
       {open && (

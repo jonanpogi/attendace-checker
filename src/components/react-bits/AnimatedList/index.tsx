@@ -153,7 +153,7 @@ const AnimatedList = <T extends { title: string; subTitle: string }>({
     >
       <div
         ref={listRef}
-        className={`max-h-[500px] overflow-y-auto sm:grow ${
+        className={`h-full overflow-y-auto sm:grow ${
           displayScrollbar
             ? '[&::-webkit-scrollbar]:w-[8px] [&::-webkit-scrollbar-thumb]:rounded-[4px] [&::-webkit-scrollbar-thumb]:bg-[#222] [&::-webkit-scrollbar-track]:bg-[#060010]'
             : 'scrollbar-hide'

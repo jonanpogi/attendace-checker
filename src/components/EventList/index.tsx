@@ -264,36 +264,38 @@ const EventList = () => {
 
         {/* List & Loading */}
         {loading ? (
-          <div className="flex min-h-[440px] w-full grow items-center justify-center">
+          <div className="flex w-full grow items-center justify-center">
             <LoadingSpinner color="text-gray-50" size={2} />
           </div>
         ) : totalItems === 0 ? (
-          <div className="flex min-h-[440px] w-full grow items-center justify-center">
+          <div className="flex w-full grow items-center justify-center">
             <p className="text-gray-50 italic">Nothing to show. 📂</p>
           </div>
         ) : (
-          <AnimatedList
-            items={items.map((item) => ({
-              ...item,
-              title: `🗓️ ${item.name}`,
-              subTitle: `${formatISODate(item.start_date)} - ${formatISODate(item.end_date)}`,
-            }))}
-            onItemSelect={(item) => [
-              setSelectedItem(item),
-              setIsPreviewOpen(true),
-            ]}
-            showGradients={true}
-            enableArrowNavigation={true}
-            displayScrollbar={false}
-            onScrollEnd={() =>
-              setQuery((prevQuery) => ({
-                ...prevQuery,
-                page: prevQuery.page + 1,
-              }))
-            }
-            itemClassName="bg-slate-900 hover:bg-slate-800 active:bg-slate-700 rounded p-4 mb-2 cursor-pointer transition-colors duration-200"
-            rightNode={(item) => renderTodayStatus(item)}
-          />
+          <div className="flex w-full grow justify-between">
+            <AnimatedList
+              items={items.map((item) => ({
+                ...item,
+                title: `🗓️ ${item.name}`,
+                subTitle: `${formatISODate(item.start_date)} - ${formatISODate(item.end_date)}`,
+              }))}
+              onItemSelect={(item) => [
+                setSelectedItem(item),
+                setIsPreviewOpen(true),
+              ]}
+              showGradients={true}
+              enableArrowNavigation={true}
+              displayScrollbar={false}
+              onScrollEnd={() =>
+                setQuery((prevQuery) => ({
+                  ...prevQuery,
+                  page: prevQuery.page + 1,
+                }))
+              }
+              itemClassName="bg-slate-900 hover:bg-slate-800 active:bg-slate-700 rounded p-4 mb-2 cursor-pointer transition-colors duration-200"
+              rightNode={(item) => renderTodayStatus(item)}
+            />
+          </div>
         )}
 
         {/* Add Event */}
