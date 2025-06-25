@@ -16,8 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Attendace Checker',
+  title: '122nd Attendance Checker',
   description: '',
+  manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.ico',
+    apple: 'icons/icon-192x192.png',
+  },
 };
 
 export default function RootLayout({
