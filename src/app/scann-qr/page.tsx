@@ -1,6 +1,7 @@
 'use client';
 
 import BackButton from '@/components/BackButton';
+import ButtonPrimary from '@/components/ButtonPrimary';
 import Container from '@/components/Container';
 import Icon from '@/components/Icons';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -143,13 +144,13 @@ const ScannQr = () => {
                   Create your first event and get things rolling.
                 </p>
 
-                <button
+                <ButtonPrimary
                   onClick={() => router.push('/view-events')}
-                  className="mt-6 inline-flex animate-bounce items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-blue-700 active:scale-100 active:bg-blue-800"
+                  className="mt-6 inline-flex animate-bounce"
                 >
                   <Icon name="Plus" className="h-5 w-5" />
                   Create Event
-                </button>
+                </ButtonPrimary>
               </div>
             </div>
           ) : (

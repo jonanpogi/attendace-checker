@@ -106,7 +106,7 @@ export default function QRScanner() {
                 setPaused(false);
                 setScannedText('');
               }}
-              className="w-full animate-bounce rounded-md bg-green-600 py-3 text-center text-sm font-semibold text-white shadow-md transition-colors duration-300 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
+              className="w-full animate-bounce rounded-full bg-green-600 py-3 text-center text-sm font-semibold text-white shadow-md transition-colors duration-300 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
             >
               ↺ Continue Scanning?
             </button>

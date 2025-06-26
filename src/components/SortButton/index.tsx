@@ -47,7 +47,10 @@ const SortButton = ({ options, selected, onChange }: Props) => {
       >
         <Icon name="Filter" className="h-2 w-2 sm:h-3 sm:w-3" />
         <span>Sort by </span>
-        <span className="flex h-[30px] items-center rounded-full bg-gray-200 px-3 py-0 text-gray-800">
+        <span
+          className="flex h-[30px] items-center rounded-full border-2 border-[#ffffff]/[0.2] px-3 py-0"
+          style={{ background: 'linear-gradient(90deg, #6366f1, #3b82f6)' }}
+        >
           {selectedOption?.label ?? 'Select'}
         </span>
       </div>

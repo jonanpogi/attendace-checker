@@ -6,6 +6,7 @@ import Icon from '../Icons';
 import AnimatedContent from '../react-bits/AnimatedContent';
 import LoadingSpinner from '../LoadingSpinner';
 import TiltedCard from '../react-bits/TiltedCard';
+import ButtonPrimary from '../ButtonPrimary';
 // import { saveSvgAsPng } from 'save-svg-as-png';
 
 type FormData = {
@@ -156,17 +157,17 @@ export default function QRGeneratorForm() {
 
         <div className="mb-10" />
 
-        <button
+        <ButtonPrimary
           disabled={loading || validated}
           onClick={handleGenerateQR}
-          className="mb-4 flex w-full items-center justify-center rounded bg-slate-900 px-4 py-2 font-bold text-gray-50 hover:bg-slate-800 active:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mb-4 inline-flex w-full disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? (
             <LoadingSpinner color="text-gray-50" />
           ) : (
             'Generate QR Code'
           )}
-        </button>
+        </ButtonPrimary>
       </AnimatedContent>
 
       {qrValue && (
@@ -200,17 +201,19 @@ export default function QRGeneratorForm() {
                     }}
                   />
                 </div>
+                <p className="text-center text-lg font-bold text-gray-800">{`${formData.rank} ${formData.full_name}`}</p>
+                <p className="text-sm text-gray-600">{formData.afpsn}</p>
               </div>
             }
           />
 
-          <button
+          <ButtonPrimary
             onClick={handleDownloadQR}
-            className="absolute bottom-10 mt-4 rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+            className="absolute bottom-10 mx-4 mt-4 w-full max-w-xs"
           >
             <Icon name="Camera" className="mr-2 inline-block h-5 w-5" />
-            Take a screenshot and you’re good to go!
-          </button>
+            Take a screenshot and exit!
+          </ButtonPrimary>
         </div>
       )}
     </>

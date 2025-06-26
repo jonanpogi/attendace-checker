@@ -10,6 +10,7 @@ import { toUTCISOString } from '@/utils/toUTCISOString';
 import { formatDateTimeLocal } from '@/utils/formatDateTimeLocal';
 import { triggerToast } from '../ToastContainer';
 import LoadingSpinner from '../LoadingSpinner';
+import ButtonPrimary from '../ButtonPrimary';
 
 const DeleteDialog = Dialog;
 
@@ -324,28 +325,29 @@ const PreviewEvent = ({
           <div className="grow" />
 
           <div className="flex w-full flex-col gap-2 sm:flex-row">
-            {eventStatus === 'Ended' && (
-              <button
-                className="flex w-full items-center justify-center rounded-full bg-slate-900 px-2 py-1 text-gray-50"
-                onClick={handleGenerateSpreadsheet}
-              >
-                <Icon
-                  name="FileSpreadsheet"
-                  className="h-3 w-3 sm:h-5 sm:w-5"
-                />
-                <span className="ml-2 font-semibold">Generate Spreadsheet</span>
-              </button>
-            )}
-            {(eventStatus === 'Happening Now' ||
-              eventStatus === 'About to Start') && (
-              <button
-                className="bg-primary flex w-full items-center justify-center rounded-full px-2 py-1 text-gray-900"
-                onClick={() => router.push(`/scann-qr/${item.id}`)}
-              >
-                <Icon name="ScanQrCode" className="h-3 w-3 sm:h-5 sm:w-5" />
-                <span className="ml-2 font-semibold">Scan QR Now?</span>
-              </button>
-            )}
+            <button
+              disabled={
+                !(eventStatus === 'Ended' || eventStatus === 'Upcoming')
+              }
+              className="flex w-full animate-bounce items-center justify-center rounded-full bg-slate-900 px-2 py-1 text-gray-50 disabled:animate-none disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={handleGenerateSpreadsheet}
+            >
+              <Icon name="FileSpreadsheet" className="h-3 w-3 sm:h-5 sm:w-5" />
+              <span className="ml-2 font-semibold">Generate Spreadsheet</span>
+            </button>
+            <ButtonPrimary
+              disabled={
+                !(
+                  eventStatus === 'Happening Now' ||
+                  eventStatus === 'About to Start'
+                )
+              }
+              className="w-full animate-bounce disabled:animate-none disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={() => router.push(`/scann-qr/${item.id}`)}
+            >
+              <Icon name="ScanQrCode" className="h-3 w-3 sm:h-5 sm:w-5" />
+              <span className="ml-2 font-semibold">Scan QR Now?</span>
+            </ButtonPrimary>
           </div>
         </AnimatedContent>
       </DrawerFormWrapper>

@@ -4,6 +4,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import '../styles/globals.css';
 import { ThemeProvider } from '@/components/them-provider';
 import ToastContainer from '@/components/ToastContainer';
+import OfflineDetector from '@/components/OfflineDetector';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -36,6 +37,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <OfflineDetector />
           {children}
         </ThemeProvider>
         <SpeedInsights />

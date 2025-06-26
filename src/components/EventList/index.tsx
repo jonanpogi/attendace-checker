@@ -190,7 +190,7 @@ const EventList = () => {
         scale={1.1}
         threshold={0.2}
         delay={0.3}
-        className="hide-scrollbar flex h-full w-full flex-col items-center justify-center sm:w-[550px]"
+        className="hide-scrollbar flex min-h-screen w-full flex-col items-center justify-center sm:w-[550px]"
       >
         {/* Title */}
         <div className="mb-8 flex items-center justify-center gap-2">
@@ -209,9 +209,15 @@ const EventList = () => {
                 key={index}
                 className={`sm:text-md rounded-full px-3 py-0 text-sm font-semibold transition-colors duration-200 sm:px-4 sm:py-1 ${
                   query.filter !== filter.name
-                    ? 'border-2 border-[#ffffff]/[0.2] bg-slate-900 text-gray-500 hover:bg-slate-800 active:bg-slate-700'
-                    : 'border bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400'
+                    ? 'border-2 border-[#ffffff]/[0.2] bg-slate-900 text-gray-500 hover:scale-110 hover:bg-slate-800 active:bg-slate-700'
+                    : 'border-2 border-[#ffffff]/[0.2] hover:scale-110 hover:bg-gray-300 active:bg-gray-400'
                 }`}
+                style={{
+                  background:
+                    query.filter === filter.name
+                      ? 'linear-gradient(90deg, #6366f1, #3b82f6)'
+                      : undefined,
+                }}
                 onClick={() => {
                   if (query.filter === filter.name) return;
 

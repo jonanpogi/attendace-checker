@@ -6,6 +6,7 @@ import { usePortal } from '@/hooks/usePortal';
 import AnimatedContent from '../react-bits/AnimatedContent';
 import Image from 'next/image';
 import LoadingSpinner from '../LoadingSpinner';
+import ButtonPrimary from '../ButtonPrimary';
 
 type Props = {
   isOpen: boolean;
@@ -150,13 +151,13 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }: Props) => {
             <p className="mb-4 text-sm text-red-500">{errorMessage}</p>
           )}
 
-          <button
+          <ButtonPrimary
             type="submit"
             disabled={loading || validated}
-            className="mb-4 flex w-full items-center justify-center rounded bg-green-800 px-4 py-2 font-bold text-gray-50 hover:scale-105 hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-80"
+            className="mb-4 disabled:cursor-not-allowed disabled:opacity-80"
           >
             {loading ? <LoadingSpinner color="text-gray-50" /> : 'Submit'}
-          </button>
+          </ButtonPrimary>
         </form>
       </AnimatedContent>
     </div>,
