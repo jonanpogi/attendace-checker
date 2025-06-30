@@ -79,12 +79,14 @@ export default function QRScanner() {
           />
           <h1 className="text-2xl font-bold">QR Code Scanner</h1>
         </div>
-        <Scanner
-          onScan={handleScan}
-          onError={handleError}
-          allowMultiple={false}
-          paused={paused}
-        />
+        {!paused && (
+          <Scanner
+            key={Date.now()}
+            onScan={handleScan}
+            onError={handleError}
+            allowMultiple={false}
+          />
+        )}
         {!scannedResult ? (
           <p className="mt-4 text-center text-sm text-gray-400">
             Point your camera at a QR code to scan it.

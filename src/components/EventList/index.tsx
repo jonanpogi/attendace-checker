@@ -328,7 +328,7 @@ const EventList = () => {
       >
         {selectedItem && (
           <PreviewEvent
-            key={selectedItem.id}
+            key={Date.now()}
             item={selectedItem}
             status={(item) => renderTodayStatus(item)}
             onDrawerClose={() => setIsPreviewOpen(false)}
