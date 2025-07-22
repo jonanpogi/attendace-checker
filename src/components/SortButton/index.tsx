@@ -46,9 +46,9 @@ const SortButton = ({ options, selected, onChange }: Props) => {
         className="sm:text-md flex w-full items-center gap-2 rounded-full text-sm font-semibold text-gray-50"
       >
         <Icon name="Filter" className="h-2 w-2 sm:h-3 sm:w-3" />
-        <span>Sort by </span>
+        <span className="sm:text-md text-sm">Sort by </span>
         <span
-          className="flex h-[30px] items-center rounded-full border-2 border-[#ffffff]/[0.2] px-3 py-0"
+          className="sm:text-md flex h-[24px] items-center rounded-full border-2 border-[#ffffff]/[0.2] px-3 py-[0] text-sm sm:h-[30px] sm:px-4 sm:py-1"
           style={{ background: 'linear-gradient(90deg, #6366f1, #3b82f6)' }}
         >
           {selectedOption?.label ?? 'Select'}
@@ -56,7 +56,7 @@ const SortButton = ({ options, selected, onChange }: Props) => {
       </div>
 
       {open && (
-        <div className="ring-opacity-5 absolute -left-32 z-10 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black sm:-left-24">
+        <div className="ring-opacity-5 absolute left-12 z-10 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black sm:-left-24">
           <div className="py-1">
             {options.map((option) => (
               <label

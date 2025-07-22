@@ -17,6 +17,7 @@ import useMediaQuery from '@/hooks/useMediaQuery';
 import AddEvent from './AddEvent';
 import { triggerToast } from '../ToastContainer';
 import useScreenWidth from '@/hooks/useScreenWidth';
+import ButtonPrimary from '../ButtonPrimary';
 
 const PreviewDrawer = Drawer;
 const AddDrawer = Drawer;
@@ -202,8 +203,8 @@ const EventList = () => {
         </div>
 
         {/* Filters & Sort */}
-        <div className="mb-4 flex w-full max-w-3xl items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="mb-4 flex w-full max-w-3xl flex-col-reverse items-start justify-between gap-4">
+          <div className="hide-scrollbar flex w-full items-center gap-2 overflow-x-auto">
             {filters.map((filter, index) => (
               <button
                 key={index}
@@ -304,14 +305,16 @@ const EventList = () => {
           </div>
         )}
 
+        <div className="my-5" />
+
         {/* Add Event */}
-        <button
+        <ButtonPrimary
           onClick={() => setIsAddOpen(true)}
-          className="absolute bottom-0 flex w-full items-center justify-center gap-2 rounded bg-slate-900 px-4 py-2 font-bold text-gray-50 hover:bg-slate-800 active:bg-slate-700 sm:w-[500px]"
+          className="absolute bottom-0 w-full animate-bounce"
         >
           <Icon name="Plus" className="h-4 w-4 sm:h-5 sm:w-5" />
           Add New Event
-        </button>
+        </ButtonPrimary>
       </AnimatedContent>
 
       {/* Preview Drawer */}
