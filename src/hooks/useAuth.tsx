@@ -12,7 +12,13 @@ export function useAuth() {
           credentials: 'include',
         });
 
-        setIsAuthenticated(res.status === 200);
+        if (!res.ok) {
+          console.log('Auth check failed:', res.statusText);
+        }
+
+        const data = await res.json();
+
+        setIsAuthenticated(data.data.status === 'authenticated');
       } catch (err) {
         console.error('Auth check failed:', err);
         setIsAuthenticated(false);
@@ -22,5 +28,9 @@ export function useAuth() {
     checkAuth();
   }, []);
 
-  return { isAuthenticated, loading: isAuthenticated === null };
+  return {
+    isAuthenticated,
+    loading: isAuthenticated === null,
+    setIsAuthenticated,
+  };
 }

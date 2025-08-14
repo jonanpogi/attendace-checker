@@ -1,4 +1,4 @@
-import getEvent from '@/services/events/geEvent';
+import getEvent from '@/services/events/getEvent';
 import patchEvent from '@/services/events/patchEvent';
 import { NextRequest, NextResponse } from 'next/server';
 

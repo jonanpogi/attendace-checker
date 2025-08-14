@@ -4,7 +4,13 @@ import { jwtVerify } from 'jose';
 import { COOKIE_TOKEN_NAME } from './utils/constants';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
-const PUBLIC_ROUTES = ['/api/encrypt', '/api/auth/login', '/api/auth/logout'];
+const PUBLIC_ROUTES = [
+  '/api/encrypt',
+  '/api/auth/login',
+  '/api/auth/logout',
+  '/api/auth/status',
+  '/api/scores',
+];
 
 export const config = {
   matcher: ['/api/:path*'],

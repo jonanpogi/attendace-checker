@@ -6,7 +6,7 @@ const Greetings = ({ isAuthenticated }: Props) => {
   if (!isAuthenticated) return null;
 
   return (
-    <span className="mb-20 text-center text-5xl font-bold sm:text-6xl">
+    <span className="mb-10 text-center text-5xl font-bold sm:text-6xl">
       Hello, Admin! 👋
     </span>
   );

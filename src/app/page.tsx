@@ -1,12 +1,12 @@
 'use client';
 
 import Container from '@/components/Container';
-import FloatingBadge from '@/components/FloatingBadge';
 import Greetings from '@/components/Greetings';
 import InstallPWAAlert from '@/components/InstallPWAAlert';
 import MainSelection from '@/components/MainSelection';
 import AnimatedContent from '@/components/react-bits/AnimatedContent';
 import BlurText from '@/components/react-bits/BlurText';
+import SportFestButton from '@/components/SportFestButton';
 import { useAuth } from '@/hooks/useAuth';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import Image from 'next/image';
@@ -18,7 +18,7 @@ export default function Home() {
   return (
     <>
       <InstallPWAAlert />
-      <Container>
+      <Container showFooter>
         <Greetings isAuthenticated={isAuthenticated!} />
         <Image
           src={'122nd_logo.svg'}
@@ -39,7 +39,7 @@ export default function Home() {
           delay={50}
           animateBy="words"
           direction="top"
-          className="mb-8 text-center text-sm text-gray-200 sm:text-base"
+          className="mb-2 text-center text-sm text-gray-200 sm:text-base"
         />
         <AnimatedContent
           distance={150}
@@ -53,7 +53,7 @@ export default function Home() {
         >
           {!loading && <MainSelection isAuthenticated={isAuthenticated!} />}
         </AnimatedContent>
-        <FloatingBadge />
+        <SportFestButton />
       </Container>
     </>
   );
