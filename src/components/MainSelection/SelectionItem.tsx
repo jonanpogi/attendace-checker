@@ -12,6 +12,7 @@ type Props = {
   icon: IconName;
   link: string;
   isAuthenticated: boolean;
+  setIsAuthenticated: (v: boolean) => void;
 };
 
 const SelectionItem = ({
@@ -20,6 +21,7 @@ const SelectionItem = ({
   icon,
   link,
   isAuthenticated,
+  setIsAuthenticated,
 }: Props) => {
   const [openModal, setOpenModal] = useState(false);
 
@@ -50,7 +52,11 @@ const SelectionItem = ({
       <LoginModal
         isOpen={openModal}
         onClose={() => setOpenModal(false)}
-        onLoginSuccess={() => router.push(link)}
+        onLoginSuccess={() => {
+          setIsAuthenticated(true);
+          window.dispatchEvent(new Event('auth:changed'));
+          router.push(link);
+        }}
       />
     </>
   );

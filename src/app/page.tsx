@@ -13,7 +13,7 @@ import Image from 'next/image';
 
 export default function Home() {
   const isMobile = useMediaQuery('(max-width: 640px)');
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, setIsAuthenticated, loading } = useAuth();
 
   return (
     <>
@@ -51,7 +51,12 @@ export default function Home() {
           scale={1.1}
           className="w-full p-4"
         >
-          {!loading && <MainSelection isAuthenticated={isAuthenticated!} />}
+          {!loading && (
+            <MainSelection
+              isAuthenticated={isAuthenticated!}
+              setIsAuthenticated={setIsAuthenticated}
+            />
+          )}
         </AnimatedContent>
         <SportFestButton />
       </Container>

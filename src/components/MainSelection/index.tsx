@@ -5,6 +5,7 @@ import SelectionItem from './SelectionItem';
 
 type Props = {
   isAuthenticated: boolean;
+  setIsAuthenticated: (v: boolean) => void;
 };
 
 const selections = [
@@ -28,13 +29,14 @@ const selections = [
   },
 ];
 
-const MainSelection = ({ isAuthenticated }: Props) => {
+const MainSelection = ({ isAuthenticated, setIsAuthenticated }: Props) => {
   return (
     <div className="flex h-auto w-full flex-col items-center justify-center gap-5 sm:flex-row">
       {selections.map((selection, index) => (
         <SelectionItem
           {...selection}
           isAuthenticated={isAuthenticated!}
+          setIsAuthenticated={setIsAuthenticated}
           key={index}
         />
       ))}

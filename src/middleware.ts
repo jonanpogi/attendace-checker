@@ -8,7 +8,6 @@ const PUBLIC_ROUTES = [
   '/api/encrypt',
   '/api/auth/login',
   '/api/auth/logout',
-  '/api/auth/status',
   '/api/scores',
 ];
 

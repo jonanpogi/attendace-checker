@@ -36,7 +36,7 @@ const handler = async (req: NextRequest) => {
   const token = await new SignJWT({ role: 'admin' })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('1d')
+    .setExpirationTime('90d')
     .sign(encoder.encode(process.env.JWT_SECRET!));
 
   const res = NextResponse.json({ data: { success: true } }, { status: 200 });

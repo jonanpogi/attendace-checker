@@ -326,9 +326,7 @@ const PreviewEvent = ({
 
           <div className="flex w-full flex-col gap-2 sm:flex-row">
             <button
-              disabled={
-                !(eventStatus === 'Ended' || eventStatus === 'Upcoming')
-              }
+              disabled={!(eventStatus === 'Ended')}
               className="flex w-full animate-bounce items-center justify-center rounded-full bg-slate-900 px-2 py-1 text-gray-50 disabled:animate-none disabled:cursor-not-allowed disabled:opacity-50"
               onClick={handleGenerateSpreadsheet}
             >

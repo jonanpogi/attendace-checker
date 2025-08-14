@@ -485,6 +485,7 @@ const Sports = () => {
         onClose={() => setOpenModal(false)}
         onLoginSuccess={() => {
           setIsAuthenticated(true);
+          window.dispatchEvent(new Event('auth:changed'));
           setRole('admin');
         }}
       />

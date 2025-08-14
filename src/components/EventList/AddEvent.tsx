@@ -10,6 +10,7 @@ import { triggerToast } from '../ToastContainer';
 import { getLocalDatetimeMin } from '@/utils/getLocalDatetimeMin';
 import { toUTCISOString } from '@/utils/toUTCISOString';
 import Icon from '../Icons';
+import ButtonPrimary from '../ButtonPrimary';
 
 type FormData = {
   name: string;
@@ -177,17 +178,17 @@ const AddEvent = ({ onDrawerClose, refetchEvents }: Props) => {
           <div className="grow" />
 
           {/* Submit */}
-          <button
+          <ButtonPrimary
             type="submit"
             disabled={isSubmitting}
-            className="mb-4 flex w-full items-center justify-center rounded bg-slate-800 px-4 py-2 font-bold text-gray-50 hover:bg-slate-700 active:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? (
               <LoadingSpinner color="text-gray-50" />
             ) : (
               'Save Form'
             )}
-          </button>
+          </ButtonPrimary>
         </form>
       </div>
     </DrawerFormWrapper>
