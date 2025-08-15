@@ -1,24 +1,10 @@
 import { PostEventParams } from '@/schemas/events/PostEventSchema';
 import { supabase } from '@/lib/supabase';
 
-const postEvents = async ({
-  name,
-  activity,
-  description,
-  start_date,
-  end_date,
-}: PostEventParams) => {
+const postEvents = async (eventData: PostEventParams) => {
   const { data, error } = await supabase
     .from('events')
-    .insert([
-      {
-        name,
-        activity,
-        description,
-        start_date,
-        end_date,
-      },
-    ])
+    .insert([eventData])
     .select()
     .single();
 
@@ -26,7 +12,7 @@ const postEvents = async ({
     console.error({
       fn_name: 'putEvents',
       error: error.message,
-      params: { name, activity, description, start_date, end_date },
+      params: eventData,
       timestamp: new Date().toISOString(),
     });
 

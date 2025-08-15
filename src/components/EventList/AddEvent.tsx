@@ -15,6 +15,7 @@ import ButtonPrimary from '../ButtonPrimary';
 type FormData = {
   name: string;
   activity: string;
+  committee?: string;
   start_date: string;
   end_date: string;
   description?: string;
@@ -78,7 +79,7 @@ const AddEvent = ({ onDrawerClose, refetchEvents }: Props) => {
         >
           <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
             <Icon name="Plus" className="h-5 w-5" />
-            Add New Event
+            Add Event
           </h2>
 
           {/* Name */}
@@ -113,6 +114,25 @@ const AddEvent = ({ onDrawerClose, refetchEvents }: Props) => {
             {errors.activity && (
               <p className="mt-1 text-sm text-red-500">
                 {errors.activity.message}
+              </p>
+            )}
+          </div>
+
+          {/* Committee */}
+          <div className="mb-3">
+            <label className="mb-1 block text-sm capitalize">Committee</label>
+            <input
+              type="text"
+              {...register('committee')}
+              onChange={(e) => {
+                clearErrors('committee');
+                register('committee').onChange(e);
+              }}
+              className="w-full rounded-md border border-gray-700 bg-gray-800 p-2"
+            />
+            {errors.committee && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.committee.message}
               </p>
             )}
           </div>

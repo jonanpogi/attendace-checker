@@ -4,6 +4,7 @@ export const PostEventSchema = z
   .object({
     name: z.string().min(1, 'Event name is required'),
     activity: z.string().min(1, 'Activity is required'),
+    committee: z.string().optional().default(''),
     description: z.string().optional().default(''),
     start_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: 'Start date must be a valid datetime',

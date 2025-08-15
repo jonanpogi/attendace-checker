@@ -16,7 +16,7 @@ import PreviewEvent from './PreviewEvent';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import AddEvent from './AddEvent';
 import { triggerToast } from '../ToastContainer';
-import useScreenWidth from '@/hooks/useScreenWidth';
+import useScreenDimension from '@/hooks/useScreenDimension';
 import ButtonPrimary from '../ButtonPrimary';
 
 const PreviewDrawer = Drawer;
@@ -55,7 +55,7 @@ const EventList = () => {
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Event | null>(null);
   const isMobile = useMediaQuery('(max-width: 640px)');
-  const screenWidth = useScreenWidth();
+  const { height } = useScreenDimension();
 
   const fetchEvents = async (
     page: number,
@@ -196,14 +196,30 @@ const EventList = () => {
         {/* Title */}
         <div className="mb-8 flex items-center justify-center gap-2">
           <Icon
-            name={'File'}
+            name="CalendarFold"
             className="h-8 w-8 text-gray-50 sm:h-10 sm:w-10"
           />
           <h1 className="text-2xl font-bold">Event List</h1>
         </div>
 
-        {/* Filters & Sort */}
-        <div className="mb-4 flex w-full max-w-3xl flex-col-reverse items-start justify-between gap-4">
+        {/* Sort & Filters */}
+        <div className="mb-4 flex w-full max-w-3xl flex-col items-start justify-between gap-4">
+          <SortButton
+            options={sortOptions}
+            selected={selectedSort}
+            onChange={(option) => {
+              setSelectedSort(option.name);
+              setQuery((prev) => ({
+                ...prev,
+                sortBy: option.key,
+                ascending: option.ascending,
+                page: DEFAULT_PAGE,
+              }));
+              setItems([]);
+              setLoading(true);
+            }}
+          />
+
           <div className="hide-scrollbar flex w-full items-center gap-2 overflow-x-auto">
             {filters.map((filter, index) => (
               <button
@@ -235,21 +251,6 @@ const EventList = () => {
               </button>
             ))}
           </div>
-          <SortButton
-            options={sortOptions}
-            selected={selectedSort}
-            onChange={(option) => {
-              setSelectedSort(option.name);
-              setQuery((prev) => ({
-                ...prev,
-                sortBy: option.key,
-                ascending: option.ascending,
-                page: DEFAULT_PAGE,
-              }));
-              setItems([]);
-              setLoading(true);
-            }}
-          />
         </div>
 
         {/* Search */}
@@ -304,27 +305,27 @@ const EventList = () => {
             />
           </div>
         )}
-
-        <div className="my-5" />
-
-        {/* Add Event */}
-        <ButtonPrimary
-          onClick={() => setIsAddOpen(true)}
-          className="absolute bottom-0 w-full animate-bounce"
-        >
-          <Icon name="Plus" className="h-4 w-4 sm:h-5 sm:w-5" />
-          Add New Event
-        </ButtonPrimary>
       </AnimatedContent>
+
+      {/* Add Event */}
+      <ButtonPrimary
+        onClick={() => setIsAddOpen(true)}
+        className="sm:text-md fixed right-4 bottom-4 flex h-[24px] animate-bounce items-center rounded-full border-2 border-[#ffffff]/[0.2] px-3 py-[0] text-sm sm:h-[30px] sm:px-4 sm:py-1"
+      >
+        <Icon name="Plus" className="h-4 w-4 sm:h-5 sm:w-5" />
+        Add Event
+      </ButtonPrimary>
 
       {/* Preview Drawer */}
       <PreviewDrawer
         customIdSuffix="preview-event"
         open={isPreviewOpen}
-        direction={'right'}
+        direction={isMobile ? 'bottom' : 'right'}
         onClose={() => setIsPreviewOpen(false)}
-        size={isMobile ? screenWidth || 320 : 550}
+        size={isMobile ? height - 20 : 550}
         style={{
+          borderTopLeftRadius: isMobile ? '20px' : '0px',
+          borderTopRightRadius: isMobile ? '20px' : '0px',
           backgroundColor: '#0f172b',
           backdropFilter: 'blur(10px)',
         }}
@@ -344,10 +345,12 @@ const EventList = () => {
       <AddDrawer
         customIdSuffix="add-event"
         open={isAddOpen}
-        direction={'right'}
+        direction={isMobile ? 'bottom' : 'right'}
         onClose={() => setIsAddOpen(false)}
-        size={isMobile ? screenWidth || 320 : 550}
+        size={isMobile ? height - 20 : 550}
         style={{
+          borderTopLeftRadius: isMobile ? '20px' : '0px',
+          borderTopRightRadius: isMobile ? '20px' : '0px',
           backgroundColor: '#0f172b',
           backdropFilter: 'blur(10px)',
         }}

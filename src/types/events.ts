@@ -2,6 +2,7 @@ export type Event = {
   id: string;
   name: string;
   activity: string;
+  committee: string;
   description: string;
   start_date: string;
   end_date: string;

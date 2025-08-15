@@ -2,7 +2,6 @@ import { Event } from '@/types/events';
 import CloseButton from '../CloseButton';
 import DrawerFormWrapper from '../DrawerWrapper';
 import Icon from '../Icons';
-import AnimatedContent from '../react-bits/AnimatedContent';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Dialog from '../Dialog';
@@ -69,6 +68,7 @@ const PreviewEvent = ({
     const body = {
       name: payload.name,
       activity: payload.activity,
+      committee: payload.committee,
       start_date: toUTCISOString(payload.start_date),
       end_date: toUTCISOString(payload.end_date),
       description: payload.description,
@@ -121,23 +121,11 @@ const PreviewEvent = ({
             setOpenDeleteDialog(false);
           }}
         />
-        <AnimatedContent
-          distance={150}
-          direction="vertical"
-          reverse={false}
-          duration={1.2}
-          ease="power3.out"
-          initialOpacity={0}
-          animateOpacity
-          scale={1.1}
-          threshold={0.2}
-          delay={0.3}
-          className="flex h-full flex-col gap-4 text-gray-50"
-        >
+        <div className="flex h-full flex-col gap-4 text-gray-50">
           <div className="flex w-full items-center justify-start gap-4">
             <Icon
               name="Edit"
-              className="h-5 w-5 cursor-pointer text-gray-400 sm:h-6 sm:w-6"
+              className={`h-5 w-5 cursor-pointer ${editMode ? 'animate-pulse text-blue-400' : 'text-gray-400'} sm:h-6 sm:w-6`}
               onClick={() => setEditMode(!editMode)}
             />
             <Icon
@@ -207,7 +195,39 @@ const PreviewEvent = ({
                   </div>
                 ) : (
                   <span>
-                    <strong>Activity:</strong> {item.activity}
+                    <strong>Activity:</strong> {item.activity || '-'}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-row items-center gap-2">
+                <Icon name="UsersRound" className="h-4 w-4 text-blue-300" />
+                {editMode ? (
+                  <div className="flex w-full items-center gap-2">
+                    <input
+                      disabled={loading}
+                      className="rounded bg-slate-800 px-2 py-1 text-white"
+                      value={payload.committee || ''}
+                      onChange={(e) =>
+                        setPayload({ ...payload, committee: e.target.value })
+                      }
+                      onFocus={() => setFocusField('committee')}
+                    />
+                    {focusField === 'committee' && loading ? (
+                      <LoadingSpinner size={1} />
+                    ) : (
+                      focusField === 'committee' && (
+                        <Icon
+                          name="Check"
+                          className="h-5 w-5 animate-bounce cursor-pointer text-green-400 hover:scale-120 sm:h-6 sm:w-6"
+                          onClick={() => handleUpdate()}
+                        />
+                      )
+                    )}
+                  </div>
+                ) : (
+                  <span>
+                    <strong>Committee:</strong> {item.committee || '-'}
                   </span>
                 )}
               </div>
@@ -347,7 +367,7 @@ const PreviewEvent = ({
               <span className="ml-2 font-semibold">Scan QR Now?</span>
             </ButtonPrimary>
           </div>
-        </AnimatedContent>
+        </div>
       </DrawerFormWrapper>
 
       <DeleteDialog
