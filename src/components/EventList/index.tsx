@@ -191,7 +191,7 @@ const EventList = () => {
         scale={1.1}
         threshold={0.2}
         delay={0.3}
-        className="hide-scrollbar flex min-h-screen w-full flex-col items-center justify-center sm:w-[550px]"
+        className="hide-scrollbar flex min-h-screen w-full flex-col items-center justify-center sm:w-[600px]"
       >
         {/* Title */}
         <div className="mb-8 flex items-center justify-center gap-2">

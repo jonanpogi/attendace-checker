@@ -6,6 +6,12 @@ import Image from 'next/image';
 import LoginModal from '@/components/LoginModal';
 import { useAuth } from '@/hooks/useAuth';
 import useHasMounted from '@/hooks/useHasMounted';
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  animate,
+} from 'framer-motion';
 
 // Fixed teams and games data
 const TEAMS = [
@@ -64,6 +70,51 @@ const ALL_GAMES = GAME_SECTIONS.flatMap((s) => s.games);
 
 // Types
 type ScoreState = Record<string, Record<TeamKey, number>>; // game -> team -> points
+
+/* helper: animated number with separators */
+const AnimatedNumber = ({ value }: { value: number }) => {
+  const mv = useMotionValue(value);
+  const [display, setDisplay] = useState(value);
+
+  useEffect(() => {
+    const controls = animate(mv, value, { duration: 0.5, ease: 'easeOut' });
+    return () => controls.stop();
+  }, [mv, value]);
+
+  useEffect(() => mv.on('change', (v) => setDisplay(Math.round(v))), [mv]);
+
+  return <>{display.toLocaleString()}</>;
+};
+
+/* track rank changes to show ▲ ▼ badge */
+const prevPlacesRef = {
+  current: { white: 0, blue: 0, gold: 0 } as Record<TeamKey, number>,
+};
+
+const useRankDeltas = (leaderboard: { team: TeamKey; place: number }[]) => {
+  const [deltas, setDeltas] = useState<Record<TeamKey, number>>({
+    white: 0,
+    blue: 0,
+    gold: 0,
+  });
+
+  useEffect(() => {
+    const next: Record<TeamKey, number> = { white: 0, blue: 0, gold: 0 };
+
+    for (const row of leaderboard) {
+      const prev = prevPlacesRef.current[row.team];
+      if (prev && prev !== row.place) next[row.team] = prev - row.place; // + = moved up, - = down
+    }
+
+    setDeltas(next);
+
+    prevPlacesRef.current = Object.fromEntries(
+      leaderboard.map((r) => [r.team, r.place] as const),
+    ) as Record<TeamKey, number>;
+  }, [leaderboard]);
+
+  return deltas;
+};
 
 const TeamPill = ({
   team,
@@ -188,6 +239,8 @@ const Sports = () => {
       .map((row, idx) => ({ ...row, place: idx + 1 }));
   }, [totals]);
 
+  const deltas = useRankDeltas(leaderboard);
+
   const setScore = async (game: string, team: TeamKey, value: number) => {
     if (!isAdmin) return;
     const safeVal = Math.max(0, value || 0);
@@ -306,32 +359,114 @@ const Sports = () => {
             <h2 className="mb-3 text-lg font-bold tracking-widest text-slate-300 uppercase">
               Overall Leaderboard
             </h2>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              {leaderboard.map((row) => (
-                <div
-                  key={row.team}
-                  className="rounded-2xl bg-slate-900/60 p-5 shadow-[0_0_24px_rgba(2,6,23,0.6)] ring-1 ring-cyan-500/20"
-                >
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-lg tracking-widest text-slate-400 uppercase">
-                      {row.place === 1
-                        ? '🥇 1st'
-                        : row.place === 2
-                          ? '🥈 2nd'
-                          : '🥉 3rd'}
-                    </span>
-                    <TeamPill team={row.team as TeamKey} />
-                  </div>
-                  <div
-                    className="font-mono text-5xl leading-none font-black tracking-widest text-emerald-300 drop-shadow-[0_0_16px_rgba(16,185,129,0.35)]"
-                    style={{ textShadow: '0 0 14px rgba(16,185,129,.35)' }}
+
+            <motion.div
+              layout
+              className="grid grid-cols-1 gap-4 md:grid-cols-3"
+              transition={{
+                layout: {
+                  type: 'spring',
+                  stiffness: 600,
+                  damping: 35,
+                  mass: 0.6,
+                },
+              }}
+            >
+              <AnimatePresence>
+                {leaderboard.map((row) => (
+                  <motion.div
+                    key={row.team}
+                    layout
+                    layoutId={`card-${row.team}`}
+                    initial={{ opacity: 0, scale: 0.98, y: 8 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 500,
+                      damping: 30,
+                      mass: 0.5,
+                    }}
+                    className="relative rounded-2xl bg-slate-900/60 p-5 shadow-[0_0_24px_rgba(2,6,23,0.6)] ring-1 ring-cyan-500/20"
                   >
-                    {row.total}
-                  </div>
-                  <div className="mt-1 text-slate-300">{row.name}</div>
-                </div>
-              ))}
-            </div>
+                    {/* rank + team */}
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="text-lg tracking-widest text-slate-400 uppercase">
+                        {row.place === 1 ? (
+                          <>
+                            <span className="text-3xl">🥇</span>1st
+                          </>
+                        ) : row.place === 2 ? (
+                          <>
+                            <span className="text-3xl">🥈</span>2nd
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-3xl">🥉</span>3rd
+                          </>
+                        )}
+                      </span>
+
+                      <div className="flex items-center gap-2">
+                        {/* movement badge */}
+                        <AnimatePresence>
+                          {!!deltas[row.team] && (
+                            <motion.span
+                              initial={{
+                                y: deltas[row.team] > 0 ? 10 : -10,
+                                opacity: 0,
+                              }}
+                              animate={{ y: 0, opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              className={
+                                'rounded-full px-2 py-0.5 text-xs font-bold tracking-widest uppercase ' +
+                                (deltas[row.team] > 0
+                                  ? 'bg-emerald-400/90 text-emerald-950'
+                                  : 'bg-rose-400/90 text-rose-950')
+                              }
+                              title={
+                                deltas[row.team] > 0 ? 'Moved up' : 'Moved down'
+                              }
+                            >
+                              {deltas[row.team] > 0 ? '▲' : '▼'}{' '}
+                              {Math.abs(deltas[row.team])}
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+
+                        <TeamPill team={row.team as TeamKey} />
+                      </div>
+                    </div>
+
+                    {/* total with count-up */}
+                    <div
+                      className="font-mono text-5xl leading-none font-black tracking-widest text-emerald-300 drop-shadow-[0_0_16px_rgba(16,185,129,0.35)]"
+                      style={{
+                        textShadow: '0 0 14px rgba(16,185,129,.35)',
+                      }}
+                    >
+                      <AnimatedNumber value={row.total} />
+                    </div>
+
+                    <div className="mt-1 text-slate-300">{row.name}</div>
+
+                    {/* subtle flash when the place for this card changes */}
+                    <AnimatePresence>
+                      {!!deltas[row.team] && (
+                        <motion.div
+                          key={`flash-${row.team}-${row.place}`}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 0.25 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.4 }}
+                          className="pointer-events-none absolute inset-0 rounded-2xl ring-2 ring-cyan-400"
+                        />
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           </section>
 
           {/* Breakdown */}
@@ -339,70 +474,73 @@ const Sports = () => {
             <h2 className="mb-3 text-lg font-bold tracking-widest text-slate-300 uppercase">
               Breakdown by Game
             </h2>
-            <div className="flex flex-col gap-6">
-              {GAME_SECTIONS.map((section) => (
-                <div
-                  key={section.title}
-                  className="overflow-hidden rounded-2xl bg-slate-900/60 shadow-[0_0_24px_rgba(2,6,23,0.6)] ring-1 ring-fuchsia-500/20"
-                >
-                  <div className="border-b border-slate-800/80 p-4">
-                    <h3 className="text-sm font-bold tracking-widest text-slate-200 uppercase">
-                      {section.title}
-                    </h3>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
-                      <thead>
-                        <tr className="bg-slate-800/60 text-slate-200">
-                          <th className="w-[30%] px-4 py-3 font-semibold tracking-widest uppercase">
-                            Game
-                          </th>
-                          {TEAMS.map((t) => (
-                            <th
-                              key={t.key}
-                              className="px-4 py-3 text-center font-semibold tracking-widest uppercase"
-                            >
-                              <TeamPill team={t.key} />
-                            </th>
-                          ))}
-                          <th className="px-4 py-3 text-center font-semibold tracking-widest uppercase">
-                            Total
-                          </th>
-                          <th className="px-4 py-3 text-center font-semibold tracking-widest uppercase">
-                            Leader
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {section.games.map((g, i) => {
-                          const row = scores[g] ?? {
-                            white: 0,
-                            blue: 0,
-                            gold: 0,
-                          };
-                          const sum = row.white + row.blue + row.gold;
-                          const maxVal = Math.max(
-                            row.white,
-                            row.blue,
-                            row.gold,
-                          );
-                          const leaders = (
-                            Object.keys(row) as TeamKey[]
-                          ).filter((k) => row[k] === maxVal && maxVal > 0);
-                          return (
-                            <tr
-                              key={g}
-                              className={
-                                i % 2 ? 'bg-slate-900/30' : 'bg-slate-900/10'
-                              }
-                            >
-                              <td className="px-4 py-3 font-medium text-slate-100">
-                                {g}
-                              </td>
+
+            {/* Mobile: card list */}
+            <div className="sm:hidden">
+              <div className="flex flex-col gap-6">
+                {GAME_SECTIONS.map((section) => (
+                  <div
+                    key={section.title}
+                    className="overflow-hidden rounded-2xl bg-slate-900/60 shadow-[0_0_24px_rgba(2,6,23,0.6)] ring-1 ring-fuchsia-500/20"
+                  >
+                    <div className="border-b border-slate-800/80 p-4">
+                      <h3 className="text-sm font-bold tracking-widest text-slate-200 uppercase">
+                        {section.title}
+                      </h3>
+                    </div>
+
+                    <ul className="space-y-3 p-3 sm:p-4">
+                      {section.games.map((g) => {
+                        const row = scores[g] ?? { white: 0, blue: 0, gold: 0 };
+                        const sum = row.white + row.blue + row.gold;
+                        const maxVal = Math.max(row.white, row.blue, row.gold);
+                        const leaders = (
+                          ['white', 'blue', 'gold'] as TeamKey[]
+                        ).filter((k) => row[k] === maxVal && maxVal > 0);
+
+                        return (
+                          <li
+                            key={g}
+                            className="rounded-xl border border-slate-800 bg-slate-900/40 p-3"
+                          >
+                            {/* Header: title + leaders */}
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="font-medium break-words text-slate-100">
+                                  {g}
+                                </div>
+                              </div>
+                              <div className="text-center">
+                                {leaders.length === 0 ? (
+                                  <span className="text-slate-500">–</span>
+                                ) : (
+                                  <div className="flex items-center justify-center gap-1">
+                                    {
+                                      leaders.map((t) => (
+                                        <>
+                                          <span className="text-lg">🥇</span>
+                                          <TeamPill key={t} team={t} compact />
+                                        </>
+                                      ))[0]
+                                    }
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Team scores */}
+                            <div className="mt-3 grid grid-cols-1 gap-2">
                               {TEAMS.map((t) => (
-                                <td key={t.key} className="px-4 py-3">
+                                <div
+                                  key={t.key}
+                                  className="flex h-[45px] items-center justify-between rounded-lg bg-slate-900/60 px-2 py-2 ring-1 ring-slate-800"
+                                >
+                                  <div className="flex justify-center">
+                                    <TeamPill team={t.key} compact />
+                                  </div>
+
                                   {isAdmin ? (
-                                    <div className="mx-auto flex max-w-[200px] items-center justify-center gap-2">
+                                    <div className="flex items-center justify-center gap-1.5">
                                       <button
                                         className="h-8 w-8 rounded-md border border-cyan-500/40 bg-slate-950 text-lg leading-none text-cyan-200 shadow-[0_0_12px_rgba(34,211,238,0.25)] select-none hover:bg-slate-900 focus:ring-2 focus:ring-cyan-500/30 focus:outline-none"
                                         onClick={() => bump(g, t.key, -1)}
@@ -422,7 +560,7 @@ const Sports = () => {
                                             Number(e.target.value),
                                           )
                                         }
-                                        className="h-9 w-24 rounded-md border border-slate-700 bg-slate-950 px-2 text-center text-sm text-emerald-300 shadow-[0_0_12px_rgba(2,6,23,0.6)] focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 focus:outline-none"
+                                        className="h-9 w-16 rounded-md border border-slate-700 bg-slate-950 px-2 text-center text-sm text-emerald-300 shadow-[0_0_12px_rgba(2,6,23,0.6)] focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 focus:outline-none"
                                       />
                                       <button
                                         className="h-8 w-8 rounded-md border border-cyan-500/40 bg-slate-950 text-lg leading-none text-cyan-200 shadow-[0_0_12px_rgba(34,211,238,0.25)] select-none hover:bg-slate-900 focus:ring-2 focus:ring-cyan-500/30 focus:outline-none"
@@ -439,30 +577,164 @@ const Sports = () => {
                                       </span>
                                     </div>
                                   )}
-                                </td>
+                                </div>
                               ))}
-                              <td className="px-4 py-3 text-center font-mono text-base font-bold text-cyan-300 drop-shadow-[0_0_12px_rgba(34,211,238,0.35)]">
+                            </div>
+
+                            {/* Total scores */}
+                            <div className="mt-6 flex items-center justify-between">
+                              <div className="text-[10px] tracking-widest text-slate-400 uppercase">
+                                Total Scores
+                              </div>
+                              <div className="font-mono text-2xl font-extrabold text-cyan-300 drop-shadow-[0_0_12px_rgba(34,211,238,0.35)]">
                                 {sum}
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                {leaders.length === 0 ? (
-                                  <span className="text-slate-500">–</span>
-                                ) : (
-                                  <div className="flex items-center justify-center gap-1">
-                                    {leaders.map((t) => (
-                                      <TeamPill key={t} team={t} compact />
-                                    ))}
-                                  </div>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                              </div>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden sm:block">
+              <div className="flex flex-col gap-6">
+                {GAME_SECTIONS.map((section) => (
+                  <div
+                    key={section.title}
+                    className="overflow-hidden rounded-2xl bg-slate-900/60 shadow-[0_0_24px_rgba(2,6,23,0.6)] ring-1 ring-fuchsia-500/20"
+                  >
+                    <div className="border-b border-slate-800/80 p-4">
+                      <h3 className="text-sm font-bold tracking-widest text-slate-200 uppercase">
+                        {section.title}
+                      </h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm">
+                        <thead>
+                          <tr className="bg-slate-800/60 text-slate-200">
+                            <th className="w-[30%] px-4 py-3 font-semibold tracking-widest uppercase">
+                              Game
+                            </th>
+                            {TEAMS.map((t) => (
+                              <th
+                                key={t.key}
+                                className="px-4 py-3 text-center font-semibold tracking-widest uppercase"
+                              >
+                                <TeamPill team={t.key} />
+                              </th>
+                            ))}
+                            <th className="px-4 py-3 text-center font-semibold tracking-widest uppercase">
+                              Total
+                            </th>
+                            <th className="px-4 py-3 text-center font-semibold tracking-widest uppercase">
+                              Leader
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {section.games.map((g, i) => {
+                            const row = scores[g] ?? {
+                              white: 0,
+                              blue: 0,
+                              gold: 0,
+                            };
+                            const sum = row.white + row.blue + row.gold;
+                            const maxVal = Math.max(
+                              row.white,
+                              row.blue,
+                              row.gold,
+                            );
+                            const leaders = (
+                              Object.keys(row) as TeamKey[]
+                            ).filter((k) => row[k] === maxVal && maxVal > 0);
+                            return (
+                              <tr
+                                key={g}
+                                className={
+                                  i % 2 ? 'bg-slate-900/30' : 'bg-slate-900/10'
+                                }
+                              >
+                                <td className="px-4 py-3 font-medium text-slate-100">
+                                  {g}
+                                </td>
+                                {TEAMS.map((t) => (
+                                  <td key={t.key} className="px-4 py-3">
+                                    {isAdmin ? (
+                                      <div className="mx-auto flex max-w-[200px] items-center justify-center gap-2">
+                                        <button
+                                          className="h-8 w-8 rounded-md border border-cyan-500/40 bg-slate-950 text-lg leading-none text-cyan-200 shadow-[0_0_12px_rgba(34,211,238,0.25)] select-none hover:bg-slate-900 focus:ring-2 focus:ring-cyan-500/30 focus:outline-none"
+                                          onClick={() => bump(g, t.key, -1)}
+                                          aria-label={`Decrement ${t.name} score for ${g}`}
+                                        >
+                                          −
+                                        </button>
+                                        <input
+                                          type="number"
+                                          inputMode="numeric"
+                                          min={0}
+                                          value={row[t.key] ?? 0}
+                                          onChange={(e) =>
+                                            setScore(
+                                              g,
+                                              t.key,
+                                              Number(e.target.value),
+                                            )
+                                          }
+                                          className="h-9 w-24 rounded-md border border-slate-700 bg-slate-950 px-2 text-center text-sm text-emerald-300 shadow-[0_0_12px_rgba(2,6,23,0.6)] focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 focus:outline-none"
+                                        />
+                                        <button
+                                          className="h-8 w-8 rounded-md border border-cyan-500/40 bg-slate-950 text-lg leading-none text-cyan-200 shadow-[0_0_12px_rgba(34,211,238,0.25)] select-none hover:bg-slate-900 focus:ring-2 focus:ring-cyan-500/30 focus:outline-none"
+                                          onClick={() => bump(g, t.key, +1)}
+                                          aria-label={`Increment ${t.name} score for ${g}`}
+                                        >
+                                          +
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <div className="text-center">
+                                        <span className="inline-block rounded-md bg-slate-800/70 px-2 py-1 font-mono text-lg font-bold text-emerald-300 drop-shadow-[0_0_12px_rgba(16,185,129,0.35)]">
+                                          {row[t.key] ?? 0}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </td>
+                                ))}
+                                <td className="px-4 py-3 text-center font-mono text-base font-bold text-cyan-300 drop-shadow-[0_0_12px_rgba(34,211,238,0.35)]">
+                                  {sum}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  {leaders.length === 0 ? (
+                                    <span className="text-slate-500">–</span>
+                                  ) : (
+                                    <div className="flex items-center justify-center gap-1">
+                                      {
+                                        leaders.map((t) => (
+                                          <>
+                                            <span className="text-lg">🥇</span>
+                                            <TeamPill
+                                              key={t}
+                                              team={t}
+                                              compact
+                                            />
+                                          </>
+                                        ))[0]
+                                      }
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
 
