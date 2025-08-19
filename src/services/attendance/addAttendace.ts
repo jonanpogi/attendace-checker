@@ -10,7 +10,7 @@ const addAttendance = async ({ event_id, user_id }: AddAttendanceParams) => {
     .from('users')
     .select('*')
     .eq('id', user_id)
-    .single();
+    .maybeSingle();
 
   if (userError) {
     console.error({
@@ -21,6 +21,18 @@ const addAttendance = async ({ event_id, user_id }: AddAttendanceParams) => {
       timestamp: new Date().toISOString(),
     });
     throw new Error('Failed to fetch user');
+  }
+
+  if (!user) {
+    console.error({
+      fn_name: 'addAttendance',
+      stage: 'fetch_user',
+      error: 'User not found',
+      params: { user_id },
+      timestamp: new Date().toISOString(),
+    });
+
+    throw new Error('User not found');
   }
 
   const { data: attendance, error: attendanceError } = await supabase

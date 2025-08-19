@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
 import Icon from '../Icons';
 import AnimatedContent from '../react-bits/AnimatedContent';
-import ButtonPrimary from '../ButtonPrimary';
+// import ButtonPrimary from '../ButtonPrimary';
 import FaceCapture, { FaceCaptureHandle } from '../FaceCapture';
 
 export default function QRScanner() {
@@ -16,7 +16,10 @@ export default function QRScanner() {
   const [scannedResult, setScannedResult] = useState<{
     [key: string]: string;
   }>();
-  const [widget, setWidget] = useState<'scanner' | 'face_scanner'>('scanner');
+  const [
+    widget,
+    // setWidget
+  ] = useState<'scanner' | 'face_scanner'>('scanner');
   const faceCaptureRef = useRef<FaceCaptureHandle>(null);
 
   const handleScan = async (result: IDetectedBarcode[]) => {
@@ -150,7 +153,7 @@ export default function QRScanner() {
                 ? 'Point your camera at a QR code to scan it.'
                 : ''}
             </p>
-            <div className="my-4 flex items-center">
+            {/* <div className="my-4 flex items-center">
               <hr className="flex-grow border-gray-600" />
               <span className="mx-3 text-sm text-gray-400">or</span>
               <hr className="flex-grow border-gray-600" />
@@ -186,7 +189,7 @@ export default function QRScanner() {
               {widget === 'scanner'
                 ? 'Switch to Facial Recognition?'
                 : 'Switch to QR Scanner?'}
-            </ButtonPrimary>
+            </ButtonPrimary> */}
           </>
         ) : (
           <div className="mt-6 flex w-full max-w-md flex-col items-center justify-center rounded-lg bg-green-800 bg-gradient-to-br from-green-900 via-green-700 to-green-800 p-6 text-green-100 shadow-lg">

@@ -61,7 +61,7 @@ const handler = async (req: NextRequest) => {
     });
 
     return NextResponse.json(
-      { error: 'Failed to process attendance' },
+      { error: (error as Error).message || 'Failed to process attendance' },
       {
         status: 500,
       },

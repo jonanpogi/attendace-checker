@@ -7,7 +7,7 @@ import AnimatedContent from '../react-bits/AnimatedContent';
 import LoadingSpinner from '../LoadingSpinner';
 import TiltedCard from '../react-bits/TiltedCard';
 import ButtonPrimary from '../ButtonPrimary';
-import Stepper from '../Stepper';
+// import Stepper from '../Stepper';
 import FaceCapture, { FaceCaptureHandle } from '../FaceCapture';
 import { triggerToast } from '../ToastContainer';
 import Dialog from '../Dialog';
@@ -105,14 +105,17 @@ const QRGeneratorForm = () => {
   };
 
   const handleSubmitAll = async () => {
-    if (!faceMap) return;
+    // if (!faceMap) return;
 
     try {
       setLoading(true);
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, face_map: faceMap }),
+        body: JSON.stringify({
+          ...formData,
+          // face_map: faceMap
+        }),
       });
 
       if (!res.ok) {
@@ -122,24 +125,25 @@ const QRGeneratorForm = () => {
 
       const user = await res.json();
 
-      if (user.data.qr_val) {
-        setOpenDialog(true);
-        setBlockUI(true);
-        setQrValue(user.data.qr_val);
-      } else {
-        // Generate QR after saving basic info
-        const qrValue = await handleGenerateQR(user.data.id);
+      await handleGenerateQR(user.data.id);
+      // if (user.data.qr_val) {
+      //   setOpenDialog(true);
+      //   setBlockUI(true);
+      //   setQrValue(user.data.qr_val);
+      // } else {
+      //   // Generate QR after saving basic info
+      //   const qrValue = await handleGenerateQR(user.data.id);
 
-        // Update user with QR code in background
-        fetch('/api/users', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: user.data.id, qr_val: qrValue }),
-        }).catch((error) => {
-          console.error('Error updating user QR code:', error);
-          triggerToast('error', 'Failed to update user QR code');
-        });
-      }
+      //   // Update user with QR code in background
+      //   fetch('/api/users', {
+      //     method: 'PATCH',
+      //     headers: { 'Content-Type': 'application/json' },
+      //     body: JSON.stringify({ id: user.data.id, qr_val: qrValue }),
+      //   }).catch((error) => {
+      //     console.error('Error updating user QR code:', error);
+      //     triggerToast('error', 'Failed to update user QR code');
+      //   });
+      // }
     } catch (e) {
       console.error(e);
       triggerToast('error', 'Failed to save user');
@@ -195,7 +199,7 @@ const QRGeneratorForm = () => {
         </div>
 
         {/* Stepper Header */}
-        <div className="w-full">
+        {/* <div className="w-full">
           <Stepper
             step={step}
             steps={[
@@ -203,13 +207,14 @@ const QRGeneratorForm = () => {
               { label: 'Face Capture', value: 2 },
             ]}
           />
-        </div>
+        </div> */}
 
         {/* STEP 1: USER INFO */}
         {step === 1 && (
           <>
             <p className="mb-8 text-center text-sm text-gray-400 italic">
-              Step 1 of 2 — Fill in user details. All fields are required.
+              {/* Step 1 of 2 —  */}
+              Fill in user details. All fields are required.
             </p>
 
             {fields.map((field, index) => (
@@ -230,10 +235,13 @@ const QRGeneratorForm = () => {
             <div className="mb-10" />
             <ButtonPrimary
               disabled={validated}
-              onClick={() => setStep(2)}
+              // onClick={() => setStep(2)}
+              onClick={handleSubmitAll}
               className="mb-4 inline-flex w-full disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Next: Capture Face <Icon name="Camera" className="h-5 w-5" />
+              {/* Next: Capture Face <Icon name="Camera" className="h-5 w-5" />
+               */}
+              Submit
             </ButtonPrimary>
           </>
         )}

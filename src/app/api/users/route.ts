@@ -1,5 +1,5 @@
 import { PostUserParams, PostUserSchema } from '@/schemas/users/PostUserSchema';
-import findUserByFaceMap from '@/services/users/findUserByFaceMap';
+// import findUserByFaceMap from '@/services/users/findUserByFaceMap';
 import patchUser from '@/services/users/patchUser';
 import postUser from '@/services/users/postUser';
 import { NextRequest, NextResponse } from 'next/server';
@@ -28,22 +28,22 @@ const postHandler = async (req: NextRequest) => {
   }
 
   try {
-    const faceMap = validate.data.face_map;
-    const user = (await findUserByFaceMap(faceMap)) as {
-      id: string;
-      qr_val: string;
-    };
+    // const faceMap = validate.data.face_map;
+    // const user = (await findUserByFaceMap(faceMap)) as {
+    //   id: string;
+    //   qr_val: string;
+    // };
 
-    if (user) {
-      return NextResponse.json(
-        {
-          data: { id: user.id, qr_val: user.qr_val },
-        },
-        {
-          status: 201,
-        },
-      );
-    }
+    // if (user) {
+    //   return NextResponse.json(
+    //     {
+    //       data: { id: user.id, qr_val: user.qr_val },
+    //     },
+    //     {
+    //       status: 201,
+    //     },
+    //   );
+    // }
 
     const { id } = await postUser(validate.data);
 
