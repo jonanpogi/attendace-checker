@@ -6,16 +6,41 @@ import InstallPWAAlert from '@/components/InstallPWAAlert';
 import MainSelection from '@/components/MainSelection';
 import AnimatedContent from '@/components/react-bits/AnimatedContent';
 import BlurText from '@/components/react-bits/BlurText';
+import Splash from '@/components/Splash';
 import SportFestButton from '@/components/SportFestButton';
 import { useAuth } from '@/hooks/useAuth';
 import useMediaQuery from '@/hooks/useMediaQuery';
+import {
+  SPLASH_KEY,
+  SPLASH_INTERVAL_MS,
+  SPLASH_DURATION_MS,
+} from '@/utils/constants';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
+  const [showSplash, setShowSplash] = useState(false);
   const isMobile = useMediaQuery('(max-width: 640px)');
   const { isAuthenticated, setIsAuthenticated, loading } = useAuth();
 
-  return (
+  useEffect(() => {
+    const now = Date.now();
+    const last = Number(localStorage.getItem(SPLASH_KEY) || 0);
+
+    if (!last || now - last >= SPLASH_INTERVAL_MS) {
+      setShowSplash(true);
+      localStorage.setItem(SPLASH_KEY, String(now));
+
+      const t = setTimeout(() => setShowSplash(false), SPLASH_DURATION_MS);
+      return () => clearTimeout(t);
+    } else {
+      setShowSplash(false);
+    }
+  }, []);
+
+  return showSplash ? (
+    <Splash />
+  ) : (
     <>
       <InstallPWAAlert />
       <Container showFooter>
