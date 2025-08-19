@@ -1,4 +1,4 @@
-import { PostScoreSchema } from '@/schemas/schemas/PostScoreSchema';
+import { PostScoreSchema } from '@/schemas/scores/PostScoreSchema';
 import setScore from '@/services/scores/setScore';
 import { NextRequest, NextResponse } from 'next/server';
 

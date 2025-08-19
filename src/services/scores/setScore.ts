@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { PostScoreParams } from '@/schemas/schemas/PostScoreSchema';
+import { PostScoreParams } from '@/schemas/scores/PostScoreSchema';
 
 const setScore = async ({ game, team, value }: PostScoreParams) => {
   const { data, error } = await supabase

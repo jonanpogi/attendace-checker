@@ -1,13 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
 import Icon from '../Icons';
 import AnimatedContent from '../react-bits/AnimatedContent';
 import LoadingSpinner from '../LoadingSpinner';
 import TiltedCard from '../react-bits/TiltedCard';
 import ButtonPrimary from '../ButtonPrimary';
-// import { saveSvgAsPng } from 'save-svg-as-png';
+import Stepper from '../Stepper';
+import FaceCapture, { FaceCaptureHandle } from '../FaceCapture';
+import { triggerToast } from '../ToastContainer';
+import Dialog from '../Dialog';
 
 type FormData = {
   rank: string;
@@ -31,36 +34,45 @@ const initialFormData: FormData = {
   bos: '',
 };
 
-export default function QRGeneratorForm() {
+const QRGeneratorForm = () => {
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [validated, setValidated] = useState(false);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [qrValue, setQrValue] = useState<string | null>(null);
   const [logoDataUri, setLogoDataUri] = useState<string | null>(null);
+  const [faceMap, setFaceMap] = useState<number[] | null>(null);
+  const faceCaptureRef = useRef<FaceCaptureHandle>(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [blockUI, setBlockUI] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleGenerateQR = async () => {
+  const handleGenerateQR = async (id: string) => {
     try {
       setLoading(true);
 
       const res = await fetch('/api/encrypt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ id }),
       });
 
       if (!res.ok) {
-        throw new Error('Failed to generate QR code');
+        triggerToast('error', 'Failed to generate QR code');
+        return;
       }
 
       const { encrypted } = await res.json();
       setQrValue(encrypted);
+
+      return encrypted;
     } catch (error) {
       console.error('Error generating QR code:', error);
+      triggerToast('error', 'Failed to generate QR code');
     } finally {
       setLoading(false);
     }
@@ -85,8 +97,55 @@ export default function QRGeneratorForm() {
     //   },
     // );
 
+    if (faceCaptureRef.current) faceCaptureRef.current.stop();
     setQrValue(null);
     setFormData(initialFormData);
+    setFaceMap(null);
+    setStep(1);
+  };
+
+  const handleSubmitAll = async () => {
+    if (!faceMap) return;
+
+    try {
+      setLoading(true);
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, face_map: faceMap }),
+      });
+
+      if (!res.ok) {
+        triggerToast('error', 'Failed to save user');
+        return;
+      }
+
+      const user = await res.json();
+
+      if (user.data.qr_val) {
+        setOpenDialog(true);
+        setBlockUI(true);
+        setQrValue(user.data.qr_val);
+      } else {
+        // Generate QR after saving basic info
+        const qrValue = await handleGenerateQR(user.data.id);
+
+        // Update user with QR code in background
+        fetch('/api/users', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: user.data.id, qr_val: qrValue }),
+        }).catch((error) => {
+          console.error('Error updating user QR code:', error);
+          triggerToast('error', 'Failed to update user QR code');
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      triggerToast('error', 'Failed to save user');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -126,51 +185,88 @@ export default function QRGeneratorForm() {
         delay={0.3}
         className="hide-scrollbar mx-auto max-w-xl overflow-y-auto p-6 text-gray-50"
       >
+        {/* Header */}
         <div className="mb-4 flex items-center justify-center gap-2">
           <Icon
-            name={'QrCode'}
+            name="QrCode"
             className="h-8 w-8 text-gray-50 sm:h-10 sm:w-10"
           />
           <h1 className="text-2xl font-bold">QR Code Generator</h1>
         </div>
 
-        <p className="mb-8 text-center text-sm text-gray-400 italic">
-          Complete the form below to generate your QR code.
-          <br />
-          <strong>Note:</strong> All fields must be filled in correctly.
-        </p>
+        {/* Stepper Header */}
+        <div className="w-full">
+          <Stepper
+            step={step}
+            steps={[
+              { label: 'User Info', value: 1 },
+              { label: 'Face Capture', value: 2 },
+            ]}
+          />
+        </div>
 
-        {fields.map((field, index) => (
-          <div className="mb-3" key={index}>
-            <label className="mb-1 block text-sm capitalize">
-              {field.label}
-            </label>
-            <input
-              placeholder={field.placeHolder}
-              name={field.name}
-              value={formData[field.name]}
-              onChange={handleChange}
-              className="w-full rounded-md border border-gray-700 bg-gray-800 p-2"
+        {/* STEP 1: USER INFO */}
+        {step === 1 && (
+          <>
+            <p className="mb-8 text-center text-sm text-gray-400 italic">
+              Step 1 of 2 — Fill in user details. All fields are required.
+            </p>
+
+            {fields.map((field, index) => (
+              <div className="mb-3" key={index}>
+                <label className="mb-1 block text-sm capitalize">
+                  {field.label}
+                </label>
+                <input
+                  placeholder={field.placeHolder}
+                  name={field.name}
+                  value={formData[field.name]}
+                  onChange={handleChange}
+                  className="w-full rounded-md border border-gray-700 bg-gray-800 p-2"
+                />
+              </div>
+            ))}
+
+            <div className="mb-10" />
+            <ButtonPrimary
+              disabled={validated}
+              onClick={() => setStep(2)}
+              className="mb-4 inline-flex w-full disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Next: Capture Face <Icon name="Camera" className="h-5 w-5" />
+            </ButtonPrimary>
+          </>
+        )}
+
+        {/* STEP 2: FACE CAPTURE */}
+        {step === 2 && (
+          <>
+            <FaceCapture
+              ref={faceCaptureRef}
+              onCaptured={(arr) => setFaceMap(arr)}
             />
-          </div>
-        ))}
 
-        <div className="mb-10" />
-
-        <ButtonPrimary
-          disabled={loading || validated}
-          onClick={handleGenerateQR}
-          className="mb-4 inline-flex w-full disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {loading ? (
-            <LoadingSpinner color="text-gray-50" />
-          ) : (
-            'Generate QR Code'
-          )}
-        </ButtonPrimary>
+            <div className="flex gap-6">
+              <ButtonPrimary
+                disabled={loading}
+                onClick={() => setStep(1)}
+                className="w-[32px] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Icon name="ArrowLeft" className="h-5 w-5" />
+              </ButtonPrimary>
+              <ButtonPrimary
+                disabled={!faceMap || loading}
+                onClick={handleSubmitAll}
+                className="inline-flex w-full disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {loading ? <LoadingSpinner color="text-gray-50" /> : 'Submit'}
+              </ButtonPrimary>
+            </div>
+          </>
+        )}
       </AnimatedContent>
 
-      {qrValue && (
+      {qrValue && !blockUI && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
           <TiltedCard
             showMobileWarning={false}
@@ -216,6 +312,20 @@ export default function QRGeneratorForm() {
           </ButtonPrimary>
         </div>
       )}
+
+      <Dialog
+        isOpen={openDialog}
+        onClose={() => setOpenDialog(false)}
+        title="You already have a QR code"
+        description="Please take a screenshot of your QR code."
+        confirmText="Got it!"
+        onConfirm={() => {
+          setBlockUI(false);
+          setOpenDialog(false);
+        }}
+      />
     </>
   );
-}
+};
+
+export default QRGeneratorForm;

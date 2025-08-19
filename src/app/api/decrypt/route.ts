@@ -22,7 +22,7 @@ const handler = async (req: NextRequest) => {
   const decrypted = bytes.toString(CryptoJS.enc.Utf8);
   const parsedDecrypted = JSON.parse(decrypted);
 
-  if (!parsedDecrypted || !parsedDecrypted.afpsn) {
+  if (!parsedDecrypted || !parsedDecrypted.id) {
     console.log({
       route: 'api/decrypt',
       method: 'POST',
@@ -42,8 +42,7 @@ const handler = async (req: NextRequest) => {
   try {
     const result = await addAttendance({
       event_id: eventId,
-      user_afpsn: parsedDecrypted.afpsn,
-      context: parsedDecrypted,
+      user_id: parsedDecrypted.id,
     });
 
     return NextResponse.json(

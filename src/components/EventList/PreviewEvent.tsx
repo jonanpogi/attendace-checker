@@ -47,7 +47,10 @@ const PreviewEvent = ({
           credentials: 'include',
         },
       );
-      if (!response.ok) throw new Error('Failed to generate spreadsheet');
+      if (!response.ok) {
+        triggerToast('error', 'Failed to generate spreadsheet');
+        return;
+      }
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);

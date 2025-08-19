@@ -22,7 +22,7 @@ const selections = [
     link: '/scann-qr',
   },
   {
-    title: 'Event Reports',
+    title: 'View All Events',
     description: 'View and extract attendance events for all personnel.',
     icon: 'CalendarFold' as IconName,
     link: '/view-events',

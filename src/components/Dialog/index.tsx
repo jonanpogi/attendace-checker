@@ -3,6 +3,7 @@
 import { usePortal } from '@/hooks/usePortal';
 import CloseButton from '../CloseButton';
 import { ReactNode } from 'react';
+import ButtonPrimary from '../ButtonPrimary';
 
 type Props = {
   isOpen: boolean;
@@ -17,7 +18,7 @@ const Dialog = ({
   isOpen,
   title,
   description,
-  confirmText,
+  confirmText = 'Confirm',
   onConfirm,
   onClose,
 }: Props) => {
@@ -27,7 +28,7 @@ const Dialog = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-lg bg-slate-900 p-6 shadow-lg transition-all"
+        className="relative w-full max-w-md rounded-lg bg-slate-900 p-6 shadow-lg transition-all"
         onClick={(e) => e.stopPropagation()}
       >
         <CloseButton onClose={() => onClose()} />
@@ -41,15 +42,14 @@ const Dialog = ({
         )}
         {confirmText && (
           <div className="flex justify-end gap-2">
-            <button
+            <ButtonPrimary
               onClick={() => {
                 onConfirm?.();
                 onClose();
               }}
-              className="bg-primary rounded-full px-4 py-2 text-sm font-semibold text-gray-900 hover:scale-110"
             >
               {confirmText}
-            </button>
+            </ButtonPrimary>
           </div>
         )}
       </div>

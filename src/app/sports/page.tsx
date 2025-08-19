@@ -12,6 +12,7 @@ import {
   useMotionValue,
   animate,
 } from 'framer-motion';
+import Dialog from '@/components/Dialog';
 
 // Fixed teams and games data
 const TEAMS = [
@@ -158,6 +159,7 @@ const Sports = () => {
     for (const g of ALL_GAMES) init[g] = { white: 0, blue: 0, gold: 0 };
     return init;
   });
+  const [openDialog, setOpenDialog] = useState(false);
 
   // ---------- Realtime-enough via ETag polling ----------
   useEffect(() => {
@@ -273,7 +275,6 @@ const Sports = () => {
 
   const resetAll = async () => {
     if (!isAdmin) return;
-    if (!confirm('Reset all scores to zero?')) return;
 
     // optimistic zeroing
     setScores((prev) => {
@@ -344,7 +345,7 @@ const Sports = () => {
               {isAdmin && (
                 <>
                   <button
-                    onClick={resetAll}
+                    onClick={() => setOpenDialog(true)}
                     className="inline-flex items-center justify-center rounded-lg border border-rose-500/60 bg-rose-600/30 px-3 py-1.5 text-sm font-semibold text-rose-200 shadow-[0_0_18px_rgba(244,63,94,0.35)] hover:bg-rose-600/40 active:translate-y-px"
                   >
                     Reset All Scores
@@ -760,6 +761,15 @@ const Sports = () => {
           window.dispatchEvent(new Event('auth:changed'));
           setRole('admin');
         }}
+      />
+
+      {/* Confirmation dialog */}
+      <Dialog
+        isOpen={openDialog}
+        onClose={() => setOpenDialog(false)}
+        title="Reset Scores"
+        description="Are you sure you want to reset all scores to zero?"
+        onConfirm={resetAll}
       />
     </>
   );

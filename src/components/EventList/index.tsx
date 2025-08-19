@@ -199,7 +199,7 @@ const EventList = () => {
             name="CalendarFold"
             className="h-8 w-8 text-gray-50 sm:h-10 sm:w-10"
           />
-          <h1 className="text-2xl font-bold">Event List</h1>
+          <h1 className="text-2xl font-bold">Events</h1>
         </div>
 
         {/* Sort & Filters */}
@@ -310,7 +310,7 @@ const EventList = () => {
       {/* Add Event */}
       <ButtonPrimary
         onClick={() => setIsAddOpen(true)}
-        className="sm:text-md fixed right-4 bottom-4 flex h-[24px] animate-bounce items-center rounded-full border-2 border-[#ffffff]/[0.2] px-3 py-[0] text-sm sm:h-[30px] sm:px-4 sm:py-1"
+        className="fixed right-4 bottom-4 flex animate-bounce items-center rounded-full px-3 py-1 text-base font-semibold"
       >
         <Icon name="Plus" className="h-4 w-4 sm:h-5 sm:w-5" />
         Add Event

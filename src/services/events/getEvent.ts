@@ -5,7 +5,7 @@ const getEvent = async (id: string) => {
     .from('events')
     .select('*')
     .eq('id', id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.log({

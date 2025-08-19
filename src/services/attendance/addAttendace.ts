@@ -2,53 +2,65 @@ import { supabase } from '@/lib/supabase';
 
 type AddAttendanceParams = {
   event_id: string;
-  user_afpsn: string;
-  context?: object;
+  user_id: string;
 };
 
-const addAttendance = async ({
-  event_id,
-  user_afpsn,
-  context = {},
-}: AddAttendanceParams) => {
-  const { data: existing, error: checkError } = await supabase
+const addAttendance = async ({ event_id, user_id }: AddAttendanceParams) => {
+  const { data: user, error: userError } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', user_id)
+    .single();
+
+  if (userError) {
+    console.error({
+      fn_name: 'addAttendance',
+      stage: 'fetch_user',
+      error: userError.message,
+      params: { user_id },
+      timestamp: new Date().toISOString(),
+    });
+    throw new Error('Failed to fetch user');
+  }
+
+  const { data: attendance, error: attendanceError } = await supabase
     .from('attendance')
     .select('*')
     .eq('event_id', event_id)
-    .eq('user_afpsn', user_afpsn)
+    .eq('user_id', user_id)
     .maybeSingle();
 
-  if (checkError) {
+  if (attendanceError) {
     console.error({
       fn_name: 'addAttendance',
       stage: 'check_existing',
-      error: checkError,
-      params: { event_id, user_afpsn },
+      error: attendanceError,
+      params: { event_id, user_id },
       timestamp: new Date().toISOString(),
     });
     throw new Error('Error checking existing attendance');
   }
 
-  if (existing) return existing;
+  if (attendance) return user;
 
-  const { data, error } = await supabase
+  const { error: insertError } = await supabase
     .from('attendance')
-    .insert([{ event_id, user_afpsn, context }])
+    .insert([{ event_id, user_id }])
     .select()
     .single();
 
-  if (error) {
+  if (insertError) {
     console.error({
       fn_name: 'addAttendance',
       stage: 'insert',
-      error: error.message,
-      params: { event_id, user_afpsn, context },
+      error: insertError.message,
+      params: { event_id, user_id },
       timestamp: new Date().toISOString(),
     });
     throw new Error('Failed to add attendance');
   }
 
-  return data;
+  return user;
 };
 
 export default addAttendance;
