@@ -4,12 +4,17 @@ import { jwtVerify } from 'jose';
 import { COOKIE_TOKEN_NAME } from './utils/constants';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
-const PUBLIC_ROUTES = [
+
+const PUBLIC_GET = ['/api/scores'];
+const PUBLIC_POST = [
   '/api/encrypt',
   '/api/auth/login',
-  '/api/auth/logout',
   '/api/scores',
+  '/api/users',
 ];
+const PUBLIC_PATCH = ['/api/users'];
+const PUBLIC_PUT = ['/api/scores'];
+const PUBLIC_DELETE = [''];
 
 export const config = {
   matcher: ['/api/:path*'],
@@ -34,7 +39,15 @@ export const middleware = async (req: NextRequest) => {
     'Content-Type, Authorization',
   );
 
-  if (PUBLIC_ROUTES.includes(req.nextUrl.pathname)) return res;
+  if (
+    (req.method === 'GET' && PUBLIC_GET.includes(req.nextUrl.pathname)) ||
+    (req.method === 'POST' && PUBLIC_POST.includes(req.nextUrl.pathname)) ||
+    (req.method === 'PATCH' && PUBLIC_PATCH.includes(req.nextUrl.pathname)) ||
+    (req.method === 'PUT' && PUBLIC_PUT.includes(req.nextUrl.pathname)) ||
+    (req.method === 'DELETE' && PUBLIC_DELETE.includes(req.nextUrl.pathname))
+  ) {
+    return res;
+  }
 
   const token = req.cookies.get(COOKIE_TOKEN_NAME)?.value;
 
