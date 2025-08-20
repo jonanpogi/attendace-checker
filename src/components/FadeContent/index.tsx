@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, ReactNode } from 'react';
 
 interface FadeContentProps {
-  children: ReactNode;
+  children?: ReactNode;
   blur?: boolean;
   duration?: number;
   easing?: string;
