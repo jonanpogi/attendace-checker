@@ -1,11 +1,16 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import {
+  // useRef,
+  useState,
+} from 'react';
 import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
 import Icon from '../Icons';
 import AnimatedContent from '../react-bits/AnimatedContent';
 // import ButtonPrimary from '../ButtonPrimary';
-import FaceCapture, { FaceCaptureHandle } from '../FaceCapture';
+import {} from // FaceCapture,
+// FaceCaptureHandle,
+'../FaceCapture';
 
 export default function QRScanner() {
   const eventId = window.location.pathname.split('/').pop() || '';
@@ -20,7 +25,7 @@ export default function QRScanner() {
     widget,
     // setWidget
   ] = useState<'scanner' | 'face_scanner'>('scanner');
-  const faceCaptureRef = useRef<FaceCaptureHandle>(null);
+  // const faceCaptureRef = useRef<FaceCaptureHandle>(null);
 
   const handleScan = async (result: IDetectedBarcode[]) => {
     if (result.length === 0) {
@@ -65,40 +70,40 @@ export default function QRScanner() {
     setScannedText('');
   };
 
-  const handleFaceScan = async (face_map: number[]) => {
-    const res = await fetch('/api/users/scan', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ face_map, eventId }),
-    });
+  // const handleFaceScan = async (face_map: number[]) => {
+  //   const res = await fetch('/api/users/scan', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     credentials: 'include',
+  //     body: JSON.stringify({ face_map, eventId }),
+  //   });
 
-    if (!res.ok) {
-      const errorData = await res.text();
-      setErrorText(`Error: ${errorData || 'Failed to scan face.'}`);
-      setScannedText('');
-      return;
-    }
+  //   if (!res.ok) {
+  //     const errorData = await res.text();
+  //     setErrorText(`Error: ${errorData || 'Failed to scan face.'}`);
+  //     setScannedText('');
+  //     return;
+  //   }
 
-    const user = await res.json();
+  //   const user = await res.json();
 
-    if (!user.data) {
-      setWarningText('User not found');
-      setScannedText('');
-      return;
-    }
+  //   if (!user.data) {
+  //     setWarningText('User not found');
+  //     setScannedText('');
+  //     return;
+  //   }
 
-    setScannedResult(user.data);
-    setScannedText('Scanned Successfully!');
-    setErrorText('');
-    setPaused(true);
+  //   setScannedResult(user.data);
+  //   setScannedText('Scanned Successfully!');
+  //   setErrorText('');
+  //   setPaused(true);
 
-    if (faceCaptureRef.current) {
-      await faceCaptureRef.current.stop();
-    }
-  };
+  //   if (faceCaptureRef.current) {
+  //     await faceCaptureRef.current.stop();
+  //   }
+  // };
 
   return (
     <>
@@ -138,14 +143,15 @@ export default function QRScanner() {
               allowMultiple={false}
               styles={{ video: { transform: 'scaleX(-1)' } }}
             />
-          ) : (
-            <FaceCapture
-              key={Date.now()}
-              ref={faceCaptureRef}
-              onCaptured={(face_map) => handleFaceScan(face_map)}
-            />
-          )
-        ) : null}
+          ) : null
+        ) : //  (
+        //   <FaceCapture
+        //     key={Date.now()}
+        //     ref={faceCaptureRef}
+        //     onCaptured={(face_map) => handleFaceScan(face_map)}
+        //   />
+        // )
+        null}
         {!scannedResult ? (
           <>
             <p className="mt-4 text-center text-sm text-gray-400">

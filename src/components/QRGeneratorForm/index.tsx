@@ -4,11 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
 import Icon from '../Icons';
 import AnimatedContent from '../react-bits/AnimatedContent';
-import LoadingSpinner from '../LoadingSpinner';
+// import LoadingSpinner from '../LoadingSpinner';
 import TiltedCard from '../react-bits/TiltedCard';
 import ButtonPrimary from '../ButtonPrimary';
 // import Stepper from '../Stepper';
-import FaceCapture, { FaceCaptureHandle } from '../FaceCapture';
+import {
+  // FaceCapture,
+  FaceCaptureHandle,
+} from '../FaceCapture';
 import { triggerToast } from '../ToastContainer';
 import Dialog from '../Dialog';
 
@@ -41,7 +44,7 @@ const QRGeneratorForm = () => {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [qrValue, setQrValue] = useState<string | null>(null);
   const [logoDataUri, setLogoDataUri] = useState<string | null>(null);
-  const [faceMap, setFaceMap] = useState<number[] | null>(null);
+  // const [faceMap, setFaceMap] = useState<number[] | null>(null);
   const faceCaptureRef = useRef<FaceCaptureHandle>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [blockUI, setBlockUI] = useState(false);
@@ -100,7 +103,7 @@ const QRGeneratorForm = () => {
     if (faceCaptureRef.current) faceCaptureRef.current.stop();
     setQrValue(null);
     setFormData(initialFormData);
-    setFaceMap(null);
+    // setFaceMap(null);
     setStep(1);
   };
 
@@ -234,7 +237,7 @@ const QRGeneratorForm = () => {
 
             <div className="mb-10" />
             <ButtonPrimary
-              disabled={validated}
+              disabled={validated || loading}
               // onClick={() => setStep(2)}
               onClick={handleSubmitAll}
               className="mb-4 inline-flex w-full disabled:cursor-not-allowed disabled:opacity-50"
@@ -249,12 +252,12 @@ const QRGeneratorForm = () => {
         {/* STEP 2: FACE CAPTURE */}
         {step === 2 && (
           <>
-            <FaceCapture
+            {/* <FaceCapture
               ref={faceCaptureRef}
               onCaptured={(arr) => setFaceMap(arr)}
-            />
+            /> */}
 
-            <div className="flex gap-6">
+            {/* <div className="flex gap-6">
               <ButtonPrimary
                 disabled={loading}
                 onClick={() => setStep(1)}
@@ -269,7 +272,7 @@ const QRGeneratorForm = () => {
               >
                 {loading ? <LoadingSpinner color="text-gray-50" /> : 'Submit'}
               </ButtonPrimary>
-            </div>
+            </div> */}
           </>
         )}
       </AnimatedContent>
