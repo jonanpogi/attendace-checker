@@ -1,6 +1,6 @@
 'use client';
 
-import Footer from '../Footer';
+// import Footer from '../Footer';
 
 type Props = {
   children: React.ReactNode;
@@ -8,13 +8,20 @@ type Props = {
   showFooter?: boolean;
 };
 
-const Container = ({ children, className, showFooter = false }: Props) => {
+const Container = ({
+  children,
+  className,
+  // showFooter = false
+}: Props) => {
   const defaultClasses =
     'flex min-h-screen w-full flex-col items-center justify-center overflow-y-auto hide-scrollbar px-4 py-8';
   return (
     <>
-      <div className={className ? className : defaultClasses}>{children}</div>
-      {showFooter && <Footer />}
+      <div className={className ? className : defaultClasses}>
+        {children}
+        <div className="h-[100px]" />
+      </div>
+      {/* {showFooter && <Footer />} */}
     </>
   );
 };
