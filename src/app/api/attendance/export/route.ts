@@ -1,4 +1,4 @@
-import getAttendance from '@/services/attendance/getAttendance';
+import getAttendanceUsers from '@/services/attendance/getAttendanceUsers';
 import { NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
 
@@ -12,14 +12,14 @@ const handler = async (req: Request) => {
     return NextResponse.json({ error: 'Missing event_id' }, { status: 400 });
   }
 
-  const data = await getAttendance(eventId);
+  const data = await getAttendanceUsers(eventId);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rows = data.map((row: any) => ({
-    Rank: row.context.rank,
-    'Full Name': row.context.full_name,
-    AFPSN: row.context.afpsn,
-    BOS: row.context.bos,
+    Rank: row.rank,
+    'Full Name': row.full_name,
+    AFPSN: row.afpsn,
+    BOS: row.bos,
     'Created At': row.created_at,
     'Updated At': row.updated_at,
   }));

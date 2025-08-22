@@ -56,7 +56,7 @@ const PreviewEvent = ({
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'attendance.xlsx';
+      a.download = `attendance-${new Date().toISOString().split('T')[0]}.xlsx`;
       document.body.appendChild(a);
       a.click();
       a.remove();
