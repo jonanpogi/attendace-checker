@@ -52,7 +52,8 @@ const GAME_SECTIONS: { title: string; games: string[] }[] = [
     title: 'Boards & Precision',
     games: [
       'Chess',
-      'Archery',
+      'Archery (Male)',
+      'Archery (Female)',
       'Billiards (Male Singles)',
       'Billiards (Female Singles)',
       'Billiards (Mixed Doubles)',
