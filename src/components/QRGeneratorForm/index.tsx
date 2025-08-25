@@ -91,36 +91,31 @@ const QRGeneratorForm = () => {
   const handleDownloadQR = async () => {
     if (!qrCanvasContainerRef.current) return;
 
-    try {
-      await new Promise((r) => requestAnimationFrame(r)); // ensure re-render
+    // wait for fonts/images if needed
+    await document.fonts?.ready?.catch(() => {});
 
-      // wait for fonts/images if needed
-      await document.fonts?.ready?.catch(() => {});
+    const blob = await htmlToImage.toBlob(qrCanvasContainerRef.current, {
+      pixelRatio: 3,
+      backgroundColor: '#ffffff',
+      cacheBust: true,
+      filter: (n) =>
+        !(n instanceof Element && n.classList?.contains('no-export')),
+    });
 
-      const blob = await htmlToImage.toBlob(qrCanvasContainerRef.current, {
-        pixelRatio: 3,
-        backgroundColor: '#ffffff',
-        cacheBust: true,
-        filter: (n) =>
-          !(n instanceof Element && n.classList?.contains('no-export')),
-      });
+    if (!blob) return;
 
-      if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(formData.full_name || 'qr-card').replace(/\s+/g, '_')}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
 
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${(formData.full_name || 'qr-card').replace(/\s+/g, '_')}.png`;
-      a.click();
-
-      URL.revokeObjectURL(url);
-    } finally {
-      // if (faceCaptureRef.current) faceCaptureRef.current.stop();
-      setQrValue(null);
-      setFormData(initialFormData);
-      // setFaceMap(null);
-      // setStep(1);
-    }
+    // if (faceCaptureRef.current) faceCaptureRef.current.stop();
+    setQrValue(null);
+    setFormData(initialFormData);
+    // setFaceMap(null);
+    // setStep(1);
   };
 
   const handleSubmitAll = async () => {
@@ -175,7 +170,6 @@ const QRGeneratorForm = () => {
     return (
       <div
         ref={qrCanvasContainerRef}
-        id="qr-canvas-container"
         className="flex flex-col items-center rounded-lg bg-white p-6 shadow-xl"
       >
         <div
@@ -185,20 +179,52 @@ const QRGeneratorForm = () => {
             color: '#000000',
           }}
         >
-          <QRCode
-            value={qrValue}
-            size={256}
-            bgColor="#ffffff"
-            fgColor="#000000"
-            marginSize={2}
-            imageSettings={{
-              src: logoDataUri || '',
-              height: 32,
-              width: 32,
-              excavate: true,
-            }}
-          />
+          {/* fixed-size box to layer canvas + logo */}
+          <div
+            className="relative inline-block"
+            style={{ width: 256, height: 256 }}
+          >
+            <QRCode
+              value={qrValue}
+              size={256}
+              bgColor="#ffffff"
+              fgColor="#000000"
+              marginSize={2}
+            />
+            {logoDataUri && (
+              <>
+                {/* white disk to preserve scan contrast (like excavate) */}
+                <div
+                  className="pointer-events-none absolute"
+                  style={{
+                    top: '50%',
+                    left: '50%',
+                    width: 42,
+                    height: 42,
+                    transform: 'translate(-50%,-50%)',
+                    background: '#fff',
+                    borderRadius: '50%',
+                  }}
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={logoDataUri}
+                  alt="logo"
+                  crossOrigin="anonymous"
+                  className="pointer-events-none absolute"
+                  style={{
+                    top: '50%',
+                    left: '50%',
+                    width: 32,
+                    height: 32,
+                    transform: 'translate(-50%,-50%)',
+                  }}
+                />
+              </>
+            )}
+          </div>
         </div>
+
         <p className="text-center text-lg font-bold text-gray-800">{`${formData.rank} ${formData.full_name}`}</p>
         <p className="text-sm text-gray-600">{formData.afpsn}</p>
       </div>
