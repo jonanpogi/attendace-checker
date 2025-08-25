@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  useEffect,
   // useRef,
   useState,
 } from 'react';
@@ -26,6 +27,30 @@ export default function QRScanner() {
     // setWidget
   ] = useState<'scanner' | 'face_scanner'>('scanner');
   // const faceCaptureRef = useRef<FaceCaptureHandle>(null);
+  const [constraints, setConstraints] = useState<MediaTrackConstraints>({
+    facingMode: { ideal: 'environment' },
+  });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        // Ensure labels are available (needs permission on iOS)
+        const tmp = await navigator.mediaDevices.getUserMedia({ video: true });
+        tmp.getTracks().forEach((t) => t.stop());
+
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const back = devices.find(
+          (d) =>
+            d.kind === 'videoinput' && /back|rear|environment/i.test(d.label),
+        );
+        if (back) {
+          setConstraints({ deviceId: { exact: back.deviceId } });
+        }
+      } catch {
+        /* keep facingMode fallback */
+      }
+    })();
+  }, []);
 
   const handleScan = async (result: IDetectedBarcode[]) => {
     if (result.length === 0) {
@@ -134,14 +159,13 @@ export default function QRScanner() {
             <Scanner
               key={Date.now()}
               paused={paused}
-              constraints={{ facingMode: 'user' }}
+              constraints={constraints}
               onScan={handleScan}
               onError={(error) => {
                 console.error('Error: ', error);
                 handleError();
               }}
               allowMultiple={false}
-              styles={{ video: { transform: 'scaleX(-1)' } }}
             />
           ) : null
         ) : //  (

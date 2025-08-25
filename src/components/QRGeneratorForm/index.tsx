@@ -1,19 +1,21 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { QRCodeSVG as QRCode } from 'qrcode.react';
+import { QRCodeCanvas as QRCode } from 'qrcode.react';
 import Icon from '../Icons';
 import AnimatedContent from '../react-bits/AnimatedContent';
-// import LoadingSpinner from '../LoadingSpinner';
+import LoadingSpinner from '../LoadingSpinner';
 import TiltedCard from '../react-bits/TiltedCard';
 import ButtonPrimary from '../ButtonPrimary';
 // import Stepper from '../Stepper';
-import {
-  // FaceCapture,
-  FaceCaptureHandle,
-} from '../FaceCapture';
+// import {
+// FaceCapture,
+// FaceCaptureHandle,
+// } from '../FaceCapture';
 import { triggerToast } from '../ToastContainer';
 import Dialog from '../Dialog';
+import useMediaQuery from '@/hooks/useMediaQuery';
+import * as htmlToImage from 'html-to-image';
 
 type FormData = {
   rank: string;
@@ -38,16 +40,21 @@ const initialFormData: FormData = {
 };
 
 const QRGeneratorForm = () => {
-  const [step, setStep] = useState(1);
+  const [
+    step,
+    // setStep
+  ] = useState(1);
   const [loading, setLoading] = useState(false);
   const [validated, setValidated] = useState(false);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [qrValue, setQrValue] = useState<string | null>(null);
   const [logoDataUri, setLogoDataUri] = useState<string | null>(null);
   // const [faceMap, setFaceMap] = useState<number[] | null>(null);
-  const faceCaptureRef = useRef<FaceCaptureHandle>(null);
+  // const faceCaptureRef = useRef<FaceCaptureHandle>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [blockUI, setBlockUI] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 640px)');
+  const qrCanvasContainerRef = useRef<HTMLDivElement | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -81,30 +88,39 @@ const QRGeneratorForm = () => {
     }
   };
 
-  const handleDownloadQR = () => {
-    // const svg = document.querySelector(
-    //   '#qr-canvas-container svg',
-    // ) as SVGElement;
+  const handleDownloadQR = async () => {
+    if (!qrCanvasContainerRef.current) return;
 
-    // if (!svg) {
-    //   alert('SVG QR not ready');
-    //   return;
-    // }
+    try {
+      await new Promise((r) => requestAnimationFrame(r)); // ensure re-render
 
-    // saveSvgAsPng(
-    //   svg,
-    //   `${formData.full_name.toUpperCase() || 'UNKNOWN'}_QR.png`,
-    //   {
-    //     backgroundColor: '#ffffff',
-    //     scale: 8,
-    //   },
-    // );
+      // wait for fonts/images if needed
+      await document.fonts?.ready?.catch(() => {});
 
-    if (faceCaptureRef.current) faceCaptureRef.current.stop();
-    setQrValue(null);
-    setFormData(initialFormData);
-    // setFaceMap(null);
-    setStep(1);
+      const blob = await htmlToImage.toBlob(qrCanvasContainerRef.current, {
+        pixelRatio: 3,
+        backgroundColor: '#ffffff',
+        cacheBust: true,
+        filter: (n) =>
+          !(n instanceof Element && n.classList?.contains('no-export')),
+      });
+
+      if (!blob) return;
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${(formData.full_name || 'qr-card').replace(/\s+/g, '_')}.png`;
+      a.click();
+
+      URL.revokeObjectURL(url);
+    } finally {
+      // if (faceCaptureRef.current) faceCaptureRef.current.stop();
+      setQrValue(null);
+      setFormData(initialFormData);
+      // setFaceMap(null);
+      // setStep(1);
+    }
   };
 
   const handleSubmitAll = async () => {
@@ -153,6 +169,40 @@ const QRGeneratorForm = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const showQR = (qrValue: string | string[]) => {
+    return (
+      <div
+        ref={qrCanvasContainerRef}
+        id="qr-canvas-container"
+        className="flex flex-col items-center rounded-lg bg-white p-6 shadow-xl"
+      >
+        <div
+          className="rounded-md p-4"
+          style={{
+            backgroundColor: '#ffffff',
+            color: '#000000',
+          }}
+        >
+          <QRCode
+            value={qrValue}
+            size={256}
+            bgColor="#ffffff"
+            fgColor="#000000"
+            marginSize={2}
+            imageSettings={{
+              src: logoDataUri || '',
+              height: 32,
+              width: 32,
+              excavate: true,
+            }}
+          />
+        </div>
+        <p className="text-center text-lg font-bold text-gray-800">{`${formData.rank} ${formData.full_name}`}</p>
+        <p className="text-sm text-gray-600">{formData.afpsn}</p>
+      </div>
+    );
   };
 
   useEffect(() => {
@@ -244,7 +294,7 @@ const QRGeneratorForm = () => {
             >
               {/* Next: Capture Face <Icon name="Camera" className="h-5 w-5" />
                */}
-              Submit
+              {loading ? <LoadingSpinner color="text-gray-50" /> : 'Submit'}
             </ButtonPrimary>
           </>
         )}
@@ -279,47 +329,24 @@ const QRGeneratorForm = () => {
 
       {qrValue && !blockUI && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
-          <TiltedCard
-            showMobileWarning={false}
-            showTooltip={false}
-            rotateAmplitude={20}
-            scaleOnHover={1.5}
-            imageComponent={
-              <div className="flex flex-col items-center rounded-lg bg-white p-6 shadow-xl">
-                <div
-                  id="qr-canvas-container"
-                  className="rounded-md p-4"
-                  style={{
-                    backgroundColor: '#ffffff',
-                    color: '#000000',
-                  }}
-                >
-                  <QRCode
-                    value={qrValue}
-                    size={256}
-                    bgColor="#ffffff"
-                    fgColor="#000000"
-                    marginSize={2}
-                    imageSettings={{
-                      src: logoDataUri || '',
-                      height: 32,
-                      width: 32,
-                      excavate: true,
-                    }}
-                  />
-                </div>
-                <p className="text-center text-lg font-bold text-gray-800">{`${formData.rank} ${formData.full_name}`}</p>
-                <p className="text-sm text-gray-600">{formData.afpsn}</p>
-              </div>
-            }
-          />
+          {!isMobile ? (
+            <TiltedCard
+              showMobileWarning={false}
+              showTooltip={false}
+              rotateAmplitude={20}
+              scaleOnHover={1.5}
+              imageComponent={showQR(qrValue)}
+            />
+          ) : (
+            showQR(qrValue)
+          )}
 
           <ButtonPrimary
             onClick={handleDownloadQR}
             className="absolute bottom-10 mx-4 mt-4 w-full max-w-xs"
           >
-            <Icon name="Camera" className="mr-2 inline-block h-5 w-5" />
-            Take a screenshot and exit!
+            <Icon name="QrCode" className="mr-2 inline-block h-5 w-5" />
+            Download QR Code and exit!
           </ButtonPrimary>
         </div>
       )}
