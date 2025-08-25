@@ -55,6 +55,31 @@ const QRGeneratorForm = () => {
   const [blockUI, setBlockUI] = useState(false);
   const isMobile = useMediaQuery('(max-width: 640px)');
   const qrCanvasContainerRef = useRef<HTMLDivElement | null>(null);
+  const isIOS =
+    typeof navigator !== 'undefined' &&
+    /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  const swapCanvasWithImg = (root: HTMLElement) => {
+    const canvas = root.querySelector('#qr-canvas') as HTMLCanvasElement | null;
+
+    if (!canvas) return () => {};
+
+    // snapshot the canvas into an <img>
+    const img = document.createElement('img');
+    img.src = canvas.toDataURL('image/png'); // will fail only if canvas is tainted
+    // keep same size/position
+    img.style.width = getComputedStyle(canvas).width;
+    img.style.height = getComputedStyle(canvas).height;
+
+    canvas.style.display = 'none';
+    canvas.parentElement!.insertBefore(img, canvas);
+
+    // return a restore function
+    return () => {
+      img.remove();
+      canvas.style.display = '';
+    };
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -89,33 +114,40 @@ const QRGeneratorForm = () => {
   };
 
   const handleDownloadQR = async () => {
-    if (!qrCanvasContainerRef.current) return;
+    const node = qrCanvasContainerRef.current;
+    if (!node) return;
 
-    // wait for fonts/images if needed
+    // 1) ensure fonts ready
     await document.fonts?.ready?.catch(() => {});
 
-    const blob = await htmlToImage.toBlob(qrCanvasContainerRef.current, {
-      pixelRatio: 3,
-      backgroundColor: '#ffffff',
-      cacheBust: true,
-      filter: (n) =>
-        !(n instanceof Element && n.classList?.contains('no-export')),
-    });
+    // 2) iOS: swap canvas → img for the snapshot
+    const restore = isIOS ? swapCanvasWithImg(node) : () => {};
+    await new Promise((r) => requestAnimationFrame(r)); // let DOM update
 
-    if (!blob) return;
+    try {
+      const blob = await htmlToImage.toBlob(node, {
+        pixelRatio: isIOS ? 2 : 3, // iOS memory-friendlier
+        backgroundColor: '#ffffff',
+        cacheBust: true,
+        filter: (n) =>
+          !(n instanceof Element && n.classList?.contains('no-export')),
+      });
+      if (!blob) return;
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${(formData.full_name || 'qr-card').replace(/\s+/g, '_')}.png`;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    // if (faceCaptureRef.current) faceCaptureRef.current.stop();
-    setQrValue(null);
-    setFormData(initialFormData);
-    // setFaceMap(null);
-    // setStep(1);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${(formData.full_name || 'qr-card').replace(/\s+/g, '_')}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      restore();
+      // if (faceCaptureRef.current) faceCaptureRef.current.stop();
+      setQrValue(null);
+      setFormData(initialFormData);
+      // setFaceMap(null);
+      // setStep(1);
+    }
   };
 
   const handleSubmitAll = async () => {
@@ -190,6 +222,7 @@ const QRGeneratorForm = () => {
               bgColor="#ffffff"
               fgColor="#000000"
               marginSize={2}
+              id="qr-canvas"
             />
             {logoDataUri && (
               <>
